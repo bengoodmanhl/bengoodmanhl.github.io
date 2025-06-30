@@ -137,10 +137,10 @@ let bankList = [];
     updateBankList();
 
 			
-var bankNames = bankList.map(b => b.name);
+const bankNames = bankList.map(b => b.name);
 
-var filtered = data.filter(bankArray => {
-  var nameObj = bankArray.find(item => item.name);
+const filtered = data.filter(bankArray => {
+  const nameObj = bankArray.find(item => item.name);
   return nameObj && bankNames.includes(nameObj.name);
 });
 
