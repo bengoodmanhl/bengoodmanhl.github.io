@@ -1,9 +1,29 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/ >
-		<title>Smoothed D3.js Radar Chart</title>
- <h2>Select Two Banks</h2>
+<head>
+  <meta charset="utf-8" />
+  <title>Smoothed D3.js Radar Chart</title>
+
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      fill: #242424;
+      text-align: center;
+      cursor: default;
+    }
+
+    .tooltip {
+      fill: #333333;
+    }
+  </style>
+
+  <!-- D3.js v3 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+</head>
+<body>
+  <h2>Select Two Banks</h2>
 
   <label for="dropdown1">Bank 1:</label>
   <select id="dropdown1">
@@ -20,150 +40,100 @@
     <option value="Bank3">Bank3</option>
     <option value="Bank4">Bank4</option>
   </select>
-		
 
-		<!-- D3.js -->
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
-		
-		<style>
-			body {
-				font-family: 'Open Sans', sans-serif;
-				font-size: 11px;
-				font-weight: 300;
-				fill: #242424;
-				text-align: center;
-				text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
-				cursor: default;
-			}
-			
-			
-			}
-			
-			.tooltip {
-				fill: #333333;
-			}
-		</style>
-	
-	</head>
-	<body>
+  <div class="radarChart"></div>
 
-		<div class="radarChart"></div>
+  <!-- Your radarChart.js should define RadarChart() globally -->
+  <script src="radarChart.js"></script>
 
-		<script src="radarChart.js"></script>	
-		<script>
-      
-      /* Radar chart design created by Nadieh Bremer - VisualCinnamon.com */
-      
-			////////////////////////////////////////////////////////////// 
-			//////////////////////// Set-Up ////////////////////////////// 
-			////////////////////////////////////////////////////////////// 
+  <script>
+    const margin = { top: 100, right: 100, bottom: 100, left: 100 },
+          width = Math.min(700, window.innerWidth - 10) - margin.left - margin.right,
+          height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
 
-			var margin = {top: 100, right: 100, bottom: 100, left: 100},
-				width = Math.min(700, window.innerWidth - 10) - margin.left - margin.right,
-				height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
-					
-			////////////////////////////////////////////////////////////// 
-			////////////////////////// Data ////////////////////////////// 
-			////////////////////////////////////////////////////////////// 
+    const color = d3.scale.ordinal()
+      .range(["#EDC951", "#CC333F", "#00A0B0"]);
 
-			var data = [
-				
+    const radarChartOptions = {
+      w: width,
+      h: height,
+      margin: margin,
+      maxValue: 3.5,
+      levels: 5,
+      roundStrokes: true,
+      color: color
+    };
 
-  [
-	  {"name": "Bank1","value":0},  
-    { "axis": "Complaints per 1000", "value": 0.66 },
-    { "axis": "Closed", "value": 3.45 },
-    { "axis": "Upheld%", "value": 3.27 },
-    { "axis": "Closed 8 weeks+%", "value": 2.65 },
-    { "axis": "FOS new cases#", "value": 0.66 },
-    { "axis": "FOS Upheld%", "value": 0.81 },
-    { "axis": "FOS cases per 1m", "value": 1.13 }
-  ],
-  [
-	  	  {"name": "Bank2","value":0},
-    { "axis": "Complaints per 1000", "value": 1.11 },
-    { "axis": "Closed", "value": 1.46 },
-    { "axis": "Upheld%", "value": 1.32 },
-    { "axis": "Closed 8 weeks+%", "value": 1.87 },
-    { "axis": "FOS new cases#", "value": 1.11 },
-    { "axis": "FOS Upheld%", "value": 1.42 },
-    { "axis": "FOS cases per 1m", "value": 0.82 }
-  ],
-  [
-	  {"name": "Bank3","value":0},
-	  { "axis": "Complaints per 1000", "value": 0.71 },
-    { "axis": "Closed", "value": 1.94 },
-    { "axis": "Upheld%", "value": 2.07 },
-    { "axis": "Closed 8 weeks+%", "value": 1.59 },
-    { "axis": "FOS new cases#", "value": 0.71 },
-    { "axis": "FOS Upheld%", "value": 0.77 },
-    { "axis": "FOS cases per 1m", "value": 0.86 }
-  ],
-  [
-	{"name": "Bank4","value":0},
-	  { "axis": "Complaints per 1000", "value": 0.84 },
-    { "axis": "Closed", "value": 1.15 },
-    { "axis": "Upheld%", "value": 1.21 },
-    { "axis": "Closed 8 weeks+%", "value": 1.12 },
-    { "axis": "FOS new cases#", "value": 0.84 },
-    { "axis": "FOS Upheld%", "value": 0.93 },
-    { "axis": "FOS cases per 1m", "value": 1.57 }
-  ]
-  
-	];
-			
-let bankList = [];
+    const data = [
+      [
+        { "name": "Bank1", "value": 0 },
+        { "axis": "Complaints per 1000", "value": 0.66 },
+        { "axis": "Closed", "value": 3.45 },
+        { "axis": "Upheld%", "value": 3.27 },
+        { "axis": "Closed 8 weeks+%", "value": 2.65 },
+        { "axis": "FOS new cases#", "value": 0.66 },
+        { "axis": "FOS Upheld%", "value": 0.81 },
+        { "axis": "FOS cases per 1m", "value": 1.13 }
+      ],
+      [
+        { "name": "Bank2", "value": 0 },
+        { "axis": "Complaints per 1000", "value": 1.11 },
+        { "axis": "Closed", "value": 1.46 },
+        { "axis": "Upheld%", "value": 1.32 },
+        { "axis": "Closed 8 weeks+%", "value": 1.87 },
+        { "axis": "FOS new cases#", "value": 1.11 },
+        { "axis": "FOS Upheld%", "value": 1.42 },
+        { "axis": "FOS cases per 1m", "value": 0.82 }
+      ],
+      [
+        { "name": "Bank3", "value": 0 },
+        { "axis": "Complaints per 1000", "value": 0.71 },
+        { "axis": "Closed", "value": 1.94 },
+        { "axis": "Upheld%", "value": 2.07 },
+        { "axis": "Closed 8 weeks+%", "value": 1.59 },
+        { "axis": "FOS new cases#", "value": 0.71 },
+        { "axis": "FOS Upheld%", "value": 0.77 },
+        { "axis": "FOS cases per 1m", "value": 0.86 }
+      ],
+      [
+        { "name": "Bank4", "value": 0 },
+        { "axis": "Complaints per 1000", "value": 0.84 },
+        { "axis": "Closed", "value": 1.15 },
+        { "axis": "Upheld%", "value": 1.21 },
+        { "axis": "Closed 8 weeks+%", "value": 1.12 },
+        { "axis": "FOS new cases#", "value": 0.84 },
+        { "axis": "FOS Upheld%", "value": 0.93 },
+        { "axis": "FOS cases per 1m", "value": 1.57 }
+      ]
+    ];
 
     const dropdown1 = document.getElementById("dropdown1");
     const dropdown2 = document.getElementById("dropdown2");
+
+    dropdown1.addEventListener("change", updateBankList);
+    dropdown2.addEventListener("change", updateBankList);
 
     function updateBankList() {
       const bank1 = dropdown1.value;
       const bank2 = dropdown2.value;
 
-      // Avoid duplicates
       const names = Array.from(new Set([bank1, bank2]));
-
-      bankList = names.map(name => ({ name }));
+      const filtered = data.filter(bankArray => {
+        const nameObj = bankArray.find(item => item.name);
+        return nameObj && names.includes(nameObj.name);
+      });
 
       console.clear();
-      console.log("Updated bankList:", bankList);
+      console.log("Selected banks:", names);
+      console.log("Filtered data:", filtered);
+
+      d3.select(".radarChart").selectAll("*").remove(); // clear chart before redrawing
+
+      RadarChart(".radarChart", filtered, radarChartOptions);
     }
 
-    dropdown1.addEventListener("change", updateBankList);
-    dropdown2.addEventListener("change", updateBankList);
-
-    // Run on page load
+    // Initial chart draw
     updateBankList();
-
-			
-const bankNames = bankList.map(b => b.name);
-
-const filtered = data.filter(bankArray => {
-  const nameObj = bankArray.find(item => item.name);
-  return nameObj && bankNames.includes(nameObj.name);
-});
-
-
-			
-			////////////////////////////////////////////////////////////// 
-			//////////////////// Draw the Chart ////////////////////////// 
-			////////////////////////////////////////////////////////////// 
-
-			var color = d3.scale.ordinal()
-				.range(["#EDC951","#CC333F","#00A0B0"]);
-				
-			var radarChartOptions = {
-			  w: width,
-			  h: height,
-			  margin: margin,
-			  maxValue: 0.5,
-			  levels: 5,
-			  roundStrokes: true,
-			  color: color
-			};
-			//Call function to draw the Radar chart
-			RadarChart(".radarChart", filtered, radarChartOptions);
-		</script>
-	</body>
+  </script>
+</body>
 </html>
