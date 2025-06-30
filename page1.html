@@ -84,7 +84,7 @@
     { "axis": "FOS cases per 1m", "value": 0.86 }
   ],
   [
-	{"name": "Bank3","value":0},
+	{"name": "Bank4","value":0},
 	  { "axis": "Complaints per 1000", "value": 0.84 },
     { "axis": "Closed", "value": 1.15 },
     { "axis": "Upheld%", "value": 1.21 },
@@ -96,7 +96,8 @@
   
 	];
 			
-			
+tokeep = ["Bank2", "Bank4"]
+data.filter(function(d,i){ return tokeep.indexOf(d.name) >= 0 })			
 			
 			////////////////////////////////////////////////////////////// 
 			//////////////////// Draw the Chart ////////////////////////// 
