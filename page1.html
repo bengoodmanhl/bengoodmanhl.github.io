@@ -1,21 +1,25 @@
-
+<!DOCTYPE html>
 <html>
-	<head>
-	<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/ >
-	<meta charset="UTF-8">
-  	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-  	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		
-	<a href = "index.html">Home</a>
-  	<a href = "page1.html">Page1</a>
-
-    <h1>Page 1</h1>
-    <p>Other</p>
-</head> 
-
-<script src="http://d3js.org/d3.v3.min.js"></script>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+  <title>Radar chart</title>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
 	<script src="RadarChart.js"></script>
+	<style>
+		body {
+		  overflow: hidden;
+		  margin: 0;
+		  font-size: 14px;
+		  font-family: "Helvetica Neue", Helvetica;
+		}
 
+		#chart {
+		  position: absolute;
+		  top: 50px;
+		  left: 100px;
+		}	
+	</style>
+  </head>
   <body>
     <div id="body">
 	  <div id="chart"></div>
@@ -25,4 +29,3 @@
 
   </body>
 </html>
-
