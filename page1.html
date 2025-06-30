@@ -3,7 +3,23 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/ >
 		<title>Smoothed D3.js Radar Chart</title>
+ <h2>Select Two Banks</h2>
 
+  <label for="dropdown1">Bank 1:</label>
+  <select id="dropdown1">
+    <option value="Bank1">Bank1</option>
+    <option value="Bank2">Bank2</option>
+    <option value="Bank3">Bank3</option>
+    <option value="Bank4">Bank4</option>
+  </select>
+
+  <label for="dropdown2">Bank 2:</label>
+  <select id="dropdown2">
+    <option value="Bank1">Bank1</option>
+    <option value="Bank2">Bank2</option>
+    <option value="Bank3">Bank3</option>
+    <option value="Bank4">Bank4</option>
+  </select>
 		
 
 		<!-- D3.js -->
@@ -96,7 +112,6 @@
   
 	];
 			
-const bankList = [ { "name": "Bank2" }, { "name": "Bank4" } ];
 			
 const bankNames = bankList.map(b => b.name);
 
