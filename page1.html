@@ -96,13 +96,16 @@
   
 	];
 			
-var myFilter = [ {"name": "Bank2", "value": 0 }, {"name": "Bank4", "value": 0 } ];
+const filteredBanks = data.filter(bank => {
+  const nameObj = bank.find(item => item.name);
+  return nameObj && (nameObj.name === "Bank2" || nameObj.name === "Bank4");
+});
 
-const myArrayFiltered = data.filter((el) => {
-  return myFilter.some((f) => {
-    return f.name === el.name && f.value === el.value;
-  });
-});			
+console.log(filteredBanks);
+
+
+
+			
 			////////////////////////////////////////////////////////////// 
 			//////////////////// Draw the Chart ////////////////////////// 
 			////////////////////////////////////////////////////////////// 
