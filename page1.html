@@ -38,7 +38,7 @@ var svg = d3.select("#my_dataviz")
           "translate(" + margin.left + "," + margin.top + ")");
 
 // get the data
-d3.csv("https://github.com/bengoodmanhl/bengoodmanhl.github.io/blob/main/values.csv", function(data) {
+d3.csv("https://raw.githubusercontent.com/bengoodmanhl/bengoodmanhl.github.io/refs/heads/main/values.csv", function(data) {
 
   // X axis: scale and draw:
   var x = d3.scaleLinear()
