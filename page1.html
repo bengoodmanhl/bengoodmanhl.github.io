@@ -112,6 +112,30 @@
   
 	];
 			
+let bankList = [];
+
+    const dropdown1 = document.getElementById("dropdown1");
+    const dropdown2 = document.getElementById("dropdown2");
+
+    function updateBankList() {
+      const bank1 = dropdown1.value;
+      const bank2 = dropdown2.value;
+
+      // Avoid duplicates
+      const names = Array.from(new Set([bank1, bank2]));
+
+      bankList = names.map(name => ({ name }));
+
+      console.clear();
+      console.log("Updated bankList:", bankList);
+    }
+
+    dropdown1.addEventListener("change", updateBankList);
+    dropdown2.addEventListener("change", updateBankList);
+
+    // Run on page load
+    updateBankList();
+
 			
 const bankNames = bankList.map(b => b.name);
 
