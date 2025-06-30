@@ -4,7 +4,7 @@ class SpecialHeader extends HTMLElement {
         <p style "display: flex">
           <a href = "index.html">Home</a>
           <a href = "page1.html">Page1</a>
-          <a href = "page2.html">Page2</a>
+         
         </p>
       '
     }
