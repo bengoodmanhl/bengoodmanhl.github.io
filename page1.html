@@ -50,7 +50,7 @@ d3.csv("values.csv", function(data) {
 
   // set the parameters for the histogram
   var histogram = d3.histogram()
-      .value(function(d) { return d.price; })   // I need to give the vector of value
+      .value(function(d) { return d.value; })   // I need to give the vector of value
       .domain(x.domain())  // then the domain of the graphic
       .thresholds(x.ticks(70)); // then the numbers of bins
 
