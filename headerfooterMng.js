@@ -1,5 +1,5 @@
 class SpecialHeader extends HTMLElement {
-    connectedCallbak() {
+    connectedCallback() {
       this.innerHTML ='
         <p style = "display: flex">
           <a href = "index.html">Home</a>
