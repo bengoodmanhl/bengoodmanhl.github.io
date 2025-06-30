@@ -96,13 +96,14 @@
   
 	];
 			
-const filteredBanks = data.filter(bank => {
-  const nameObj = bank.find(item => item.name);
-  return nameObj && (nameObj.name === "Bank2" || nameObj.name === "Bank4");
+const bankList = [ { "name": "Bank2" }, { "name": "Bank4" } ];
+			
+const bankNames = bankList.map(b => b.name);
+
+const filtered = data.filter(bankArray => {
+  const nameObj = bankArray.find(item => item.name);
+  return nameObj && bankNames.includes(nameObj.name);
 });
-
-console.log(filteredBanks);
-
 
 
 			
