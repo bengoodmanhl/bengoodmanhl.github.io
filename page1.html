@@ -96,9 +96,13 @@
   
 	];
 			
-tokeep = ["Bank2", "Bank4"]
-data.filter(function(d,i){ return tokeep.indexOf(d.name) >= 0 })			
-			
+var myFilter = [ {"name": "Bank2", "value": 0 }, {"name": "Bank4", "value": 0 } ];
+
+const myArrayFiltered = data.filter((el) => {
+  return myFilter.some((f) => {
+    return f.name === el.name && f.value === el.value;
+  });
+});			
 			////////////////////////////////////////////////////////////// 
 			//////////////////// Draw the Chart ////////////////////////// 
 			////////////////////////////////////////////////////////////// 
