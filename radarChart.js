@@ -162,17 +162,17 @@ function RadarChart(id, data, options) {
 		.on('mouseover', function (d,i){
 			//Dim all blobs
 			d3.selectAll(".radarArea")
-				.transition().duration(200)
+				.transition().duration(800)
 				.style("fill-opacity", 0.1); 
 			//Bring back the hovered over blob
 			d3.select(this)
-				.transition().duration(200)
+				.transition().duration(800)
 				.style("fill-opacity", 0.7);	
 		})
 		.on('mouseout', function(){
 			//Bring back all blobs
 			d3.selectAll(".radarArea")
-				.transition().duration(200)
+				.transition().duration(800)
 				.style("fill-opacity", cfg.opacityArea);
 		});
 		
@@ -193,6 +193,9 @@ function RadarChart(id, data, options) {
 		.attr("r", cfg.dotRadius)
 		.attr("cx", function(d,i){ return rScale(d.value) * Math.cos(angleSlice*i - Math.PI/2); })
 		.attr("cy", function(d,i){ return rScale(d.value) * Math.sin(angleSlice*i - Math.PI/2); })
+		.transition()
+		.duration(1000)
+		.ease("sin-in-out")
 		.style("fill", function(d,i,j) { return cfg.color(j); })
 		.style("fill-opacity", 0.8);
 
