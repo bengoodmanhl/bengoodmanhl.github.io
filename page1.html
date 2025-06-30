@@ -61,20 +61,6 @@
 			////////////////////////////////////////////////////////////// 
 
 		
-    fetch("https://raw.githubusercontent.com/bengoodmanhl/bengoodmanhl.github.io/refs/heads/main/RadarJSON.json") // Replace this with your actual JSON URL
-      .then(response => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok " + response.statusText);
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log("Fetched JSON data:", data);
-        // You can now use `data` to update the DOM or feed into a chart
-      })
-      .catch(error => {
-        console.error("Error fetching JSON:", error);
-      });
   
 			////////////////////////////////////////////////////////////// 
 			//////////////////// Draw the Chart ////////////////////////// 
