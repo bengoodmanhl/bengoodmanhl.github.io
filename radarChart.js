@@ -30,6 +30,42 @@ function RadarChart(id, data, options) {
     d3.max(i.slice(1), o => o.value)
   ));
 
+  // Interactive Legend
+var legendZone = svg.append("g")
+  .attr("class", "legend")
+  .attr("transform", `translate(${-(cfg.w / 2)}, ${radius + 40})`);
+
+var legend = legendZone.selectAll(".legendItem")
+  .data(data)
+  .enter()
+  .append("g")
+  .attr("class", "legendItem")
+  .attr("transform", (d, i) => `translate(${i * 100}, 0)`)
+  .style("cursor", "pointer");
+
+// Rectangles
+legend.append("rect")
+  .attr("width", 12)
+  .attr("height", 12)
+  .attr("fill", (d, i) => cfg.color(i))
+  .attr("stroke", "black")
+  .attr("stroke-width", 0.5);
+
+// Text labels
+legend.append("text")
+  .attr("x", 18)
+  .attr("y", 9)
+  .style("font-size", "11px")
+  .text((d) => d[0].name);
+
+// Legend toggle functionality
+legend.on("click", function(d, i) {
+  const area = svg.selectAll(".radarWrapper").filter((dd, j) => j === i);
+  const visible = area.style("display") !== "none";
+  area.style("display", visible ? "none" : null);
+});
+
+
   // Remove previous chart
   d3.select(id).select("svg").remove();
 
