@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Bank Selector</title>
+  <title>Bank Selector with Normalization</title>
 </head>
 <body>
   <h2>Select Up to 5 Banks</h2>
@@ -14,11 +14,11 @@
   <select id="bankSelect5"></select>
 
   <script>
-    const dataUrl = 'https://your-data-source.com/banks-data.json'; // 🔁 Replace with your actual URL
+    const dataUrl = 'https://raw.githubusercontent.com/bengoodmanhl/bengoodmanhl.github.io/refs/heads/main/RadarJSON.json'; // 🔁 Replace with actual source
     const dropdownIds = ['bankSelect1', 'bankSelect2', 'bankSelect3', 'bankSelect4', 'bankSelect5'];
     let allBanksData = [];
 
-    // Fetch bank data and initialize dropdowns
+    // Fetch and initialize
     fetch(dataUrl)
       .then(res => res.json())
       .then(data => {
@@ -29,10 +29,9 @@
       })
       .catch(err => console.error('Failed to fetch bank data:', err));
 
-    // Populate a dropdown with all bank names + "None"
     function populateDropdown(id, options) {
       const select = document.getElementById(id);
-      select.innerHTML = ''; // clear existing options
+      select.innerHTML = ''; // Clear previous options
 
       const none = document.createElement('option');
       none.value = '';
@@ -47,24 +46,21 @@
       });
     }
 
-    // Get other selected bank names (excluding current select)
-    function getSelectedBanks(currentId) {
+    function getSelectedBanks(currentId = null) {
       return dropdownIds
         .filter(id => id !== currentId)
         .map(id => document.getElementById(id).value)
-        .filter(name => name); // ignore empty values
+        .filter(name => name);
     }
 
-    // Disable already-selected banks in each dropdown
     function updateDropdownOptions(currentId) {
       const selectedOthers = getSelectedBanks(currentId);
-      const currentSelect = document.getElementById(currentId);
-      Array.from(currentSelect.options).forEach(option => {
+      const select = document.getElementById(currentId);
+      Array.from(select.options).forEach(option => {
         option.disabled = selectedOthers.includes(option.value);
       });
     }
 
-    // Get selected banks’ full data
     function getSelectedBankData() {
       const selectedNames = dropdownIds
         .map(id => document.getElementById(id).value)
@@ -72,14 +68,44 @@
       return allBanksData.filter(bank => selectedNames.includes(bank.name));
     }
 
-    // Set up event listeners on dropdowns
+    function normalizeAllFields(data) {
+      if (data.length === 0) return [];
+
+      const numericKeys = Object.keys(data[0]).filter(
+        key => typeof data[0][key] === 'number'
+      );
+
+      const ranges = {};
+      numericKeys.forEach(key => {
+        const values = data.map(d => d[key]);
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+        ranges[key] = { min, max };
+      });
+
+      return data.map(bank => {
+        const normalizedBank = { name: bank.name };
+        numericKeys.forEach(key => {
+          const { min, max } = ranges[key];
+          normalizedBank[key] = max === min
+            ? 0.5
+            : (bank[key] - min) / (max - min);
+        });
+        return normalizedBank;
+      });
+    }
+
     function addChangeListeners() {
       dropdownIds.forEach(id => {
         const select = document.getElementById(id);
         select.addEventListener('change', () => {
-          dropdownIds.forEach(updateDropdownOptions); // Refresh all dropdowns
+          dropdownIds.forEach(updateDropdownOptions);
+
           const selectedBankData = getSelectedBankData();
+          const normalizedData = normalizeAllFields(selectedBankData);
+
           console.log('Selected Bank Data:', selectedBankData);
+          console.log('Normalized Data:', normalizedData);
         });
       });
     }
