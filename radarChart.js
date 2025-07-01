@@ -50,7 +50,7 @@ levelsToDraw.forEach(level => {
   const lineGen = d3.lineRadial()
     .angle((d, i) => i * angleSlice)
     .radius(d => scale(d.value))
-    .curve(d3.curveLinearClosed);
+    .curve(d3.curveCardinalClosed);
 
   data.forEach((bank, i) => {
     const values = features.map(f => ({ axis: f, value: bank[f] }));
