@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Radar Chart from JSON</title>
+  <title>Smoothed Radar Chart from JSON</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <style>
     body { font-family: sans-serif; background: #f9f9f9; }
@@ -14,8 +14,9 @@
 <body>
 <svg width="700" height="700"></svg>
 <script>
-const url = "https://raw.githubusercontent.com/bengoodmanhl/bengoodmanhl.github.io/refs/heads/main/RadarJSON.json"; 
+const url = "https://example.com/data/banks.json"; // 🔁 Replace with your actual JSON URL
 const width = 700, height = 700;
+const radius = Math.min(width, height) / 2 - 100;
 const svg = d3.select("svg")
   .attr("viewBox", `0 0 ${width} ${height}`)
   .append("g")
@@ -23,27 +24,25 @@ const svg = d3.select("svg")
 
 d3.json(url).then(data => {
   const dimensions = Object.keys(data[0]).filter(d => d !== "name");
-  const radius = Math.min(width, height) / 2 - 100;
   const angleSlice = (2 * Math.PI) / dimensions.length;
   const color = d3.scaleOrdinal(d3.schemeCategory10);
 
+  // Normalize data
   const extentByDimension = {};
   dimensions.forEach(d => {
     extentByDimension[d] = d3.extent(data, obj => obj[d]);
   });
 
-  function getPosition(dimension, value) {
-    const scale = d3.scaleLinear()
+  function getScaledRadius(dimension, value) {
+    return d3.scaleLinear()
       .domain(extentByDimension[dimension])
-      .range([0, radius]);
-    const i = dimensions.indexOf(dimension);
-    const angle = angleSlice * i - Math.PI / 2;
-    return [Math.cos(angle) * scale(value), Math.sin(angle) * scale(value)];
+      .range([0, radius])(value);
   }
 
+  // Draw grid/web
   for (let level = 0; level <= 5; level++) {
     const r = radius * (level / 5);
-    const points = dimensions.map((d, i) => {
+    const points = dimensions.map((_, i) => {
       const angle = angleSlice * i - Math.PI / 2;
       return [Math.cos(angle) * r, Math.sin(angle) * r];
     });
@@ -53,6 +52,7 @@ d3.json(url).then(data => {
       .attr("stroke", "#ccc");
   }
 
+  // Axis labels
   dimensions.forEach((dim, i) => {
     const angle = angleSlice * i - Math.PI / 2;
     const x = Math.cos(angle) * (radius + 20);
@@ -64,36 +64,36 @@ d3.json(url).then(data => {
       .text(dim);
   });
 
-const radarLine = d3.lineRadial()
-  .radius(d => d.radius)
-  .angle((d, i) => i * angleSlice)
-  .curve(d3.curveCardinalClosed);  // This adds the smoothing
+  // Smoothed radial line generator
+  const radarLine = d3.lineRadial()
+    .radius(d => d.radius)
+    .angle((d, i) => i * angleSlice)
+    .curve(d3.curveCardinalClosed);
 
-data.forEach(d => {
-  const points = dimensions.map((dim, i) => {
-    const value = d[dim];
-    const scale = d3.scaleLinear()
-      .domain(extentByDimension[dim])
-      .range([0, radius]);
-    return {
-      angle: i * angleSlice,
-      radius: scale(value)
-    };
-  });
+  data.forEach(d => {
+    const points = dimensions.map((dim, i) => {
+      return {
+        angle: i * angleSlice,
+        radius: getScaledRadius(dim, d[dim])
+      };
+    });
 
-  svg.append("path")
-    .attr("d", radarLine(points))
-    .attr("stroke", color(d.name))
-    .attr("fill", color(d.name))
-    .attr("fill-opacity", 0.1)
-    .attr("stroke-width", 2)
-    .attr("class", "line");
-});
+    // Draw filled path
+    svg.append("path")
+      .attr("d", radarLine(points))
+      .attr("stroke", color(d.name))
+      .attr("fill", color(d.name))
+      .attr("fill-opacity", 0.1)
+      .attr("stroke-width", 2)
+      .attr("class", "line");
 
-    coordinates.forEach(p => {
+    // Draw points
+    points.forEach(p => {
+      const x = Math.cos(p.angle - Math.PI / 2) * p.radius;
+      const y = Math.sin(p.angle - Math.PI / 2) * p.radius;
       svg.append("circle")
-        .attr("cx", p[0])
-        .attr("cy", p[1])
+        .attr("cx", x)
+        .attr("cy", y)
         .attr("r", 3)
         .attr("fill", color(d.name))
         .attr("class", "circle");
