@@ -1,25 +1,99 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Bank Benchmarking</title>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <meta charset="UTF-8">
+  <title>Dynamic Bank Selector</title>
   <style>
-    select { margin-right: 10px; }
+    body { font-family: sans-serif; padding: 20px; }
+    label { display: inline-block; width: 70px; font-weight: bold; }
+    select { margin-bottom: 15px; width: 320px; padding: 5px; }
   </style>
 </head>
 <body>
-  <h2>Select Up to 5 Banks</h2>
-  <select id="bankSelect1"></select>
-  <select id="bankSelect2"></select>
-  <select id="bankSelect3"></select>
-  <select id="bankSelect4"></select>
-  <select id="bankSelect5"></select>
-  
-  <div id="axisSelector"></div>
-  
-  <svg id="radarChart" width="600" height="600"></svg>
 
-  <script type="module" src="main.js"></script>
+  <h2>Select Banks to Compare</h2>
+
+  <div>
+    <label for="bank1">Bank 1:</label>
+    <select id="bank1"><option>Loading...</option></select><br>
+    <label for="bank2">Bank 2:</label>
+    <select id="bank2"><option>Loading...</option></select><br>
+    <label for="bank3">Bank 3:</label>
+    <select id="bank3"><option>Loading...</option></select><br>
+    <label for="bank4">Bank 4:</label>
+    <select id="bank4"><option>Loading...</option></select>
+  </div>
+
+  <script>
+    const dataUrl = 'https://raw.githubusercontent.com/bengoodmanhl/bengoodmanhl.github.io/refs/heads/main/RadarJSON.json'; // 🌐 Replace with your actual JSON URL
+
+    let normalizedData = [];
+
+function zNormalize(data, keys) {
+  const result = [];
+  const stats = {};
+
+  // Step 1: Calculate mean and std dev for each key
+  keys.forEach(key => {
+    const values = data.map(d => parseFloat(d[key]));
+    const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+    const stdDev = Math.sqrt(values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length);
+    stats[key] = { mean, stdDev };
+  });
+
+  // Step 2: Normalize
+  data.forEach(d => {
+    const norm = { name: d.name };
+    keys.forEach(key => {
+      const { mean, stdDev } = stats[key];
+      norm[key] = ((d[key] - mean) / stdDev).toFixed(3); // Rounded for display
+    });
+    result.push(norm);
+  });
+
+  return result;
+}
+
+fetch(dataUrl)
+  .then(res => res.json())
+  .then(rawData => {
+    const fields = [
+      'ComplaintsPer1000',
+      'UpheldPercent',
+      'Closed8WeeksPlusPercent',
+      'FOSUpheldPercent',
+      'FOSCasesPerMillion'
+    ];
+    normalizedData = zNormalize(rawData, fields);
+    populateDropdowns(normalizedData.map(d => d.name));
+  });
+
+// Optional: Triggered on dropdown change
+function createSelectedDataSet() {
+  const selectedNames = [
+    document.getElementById('bank1').value,
+    document.getElementById('bank2').value,
+    document.getElementById('bank3').value,
+    document.getElementById('bank4').value
+  ].filter(Boolean);
+
+  const selectedData = normalizedData.filter(bank => selectedNames.includes(bank.name));
+  
+  const dataSet = selectedData.map(bank => ({
+    label: bank.name,
+    data: [
+      parseFloat(bank.ComplaintsPer1000),
+      parseFloat(bank.UpheldPercent),
+      parseFloat(bank.Closed8WeeksPlusPercent),
+      parseFloat(bank.FOSUpheldPercent),
+      parseFloat(bank.FOSCasesPerMillion)
+    ]
+  }));
+
+  console.log('Normalized Dataset:', dataSet);
+  return dataSet;
+}
+  </script>
+
 </body>
 </html>
