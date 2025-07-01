@@ -26,8 +26,6 @@ function createAxisCheckboxes(features) {
   });
 }
 
-const features = Object.keys(data[0]).filter(k => k !== 'name');
-createAxisCheckboxes(features);
 
 
 
@@ -50,9 +48,17 @@ fetch(dataUrl)
       }
     }
 
+
+    
     // 🚫 Disable already-selected options in other dropdowns
     dropdownIds.forEach(updateDropdownOptions);
 
+    const features = Object.keys(data[0]).filter(k => k !== 'name');
+createAxisCheckboxes(features);
+
+    
+    
+    
     // 📊 Draw chart with pre-selected banks
     const selectedNormalized = getSelectedNormalizedData();
     drawRadarChart({
