@@ -15,6 +15,26 @@ fetch(dataUrl)
     
     const bankNames = data.map(bank => bank.name);
     dropdownIds.forEach(id => populateDropdown(id, bankNames));
+
+    // 🌟 Pre-select first 3 banks in the first 3 dropdowns
+    for (let i = 0; i < 3; i++) {
+      const select = document.getElementById(dropdownIds[i]);
+      if (bankNames[i]) {
+        select.value = bankNames[i];
+      }
+    }
+
+    // 🚫 Disable already-selected options in other dropdowns
+    dropdownIds.forEach(updateDropdownOptions);
+
+    // 📊 Draw chart with pre-selected banks
+    const selectedNormalized = getSelectedNormalizedData();
+    drawRadarChart({
+      data: selectedNormalized,
+      elementId: 'radarChart',
+      size: 500
+    });
+
     addChangeListeners();
   })
   .catch(err => console.error('Failed to fetch bank data:', err));
