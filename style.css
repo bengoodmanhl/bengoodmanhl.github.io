@@ -1,0 +1,50 @@
+body {
+  font-family: sans-serif;
+  background: #f9f9f9;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.chart-container {
+  width: 100%;
+  max-width: 700px;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.axisLabel {
+  font-size: 12px;
+  fill: #333;
+  text-anchor: middle;
+}
+
+.line {
+  fill-opacity: 0.1;
+  stroke-width: 2px;
+}
+
+.circle {
+  fill-opacity: 0.6;
+}
+
+.tooltip {
+  position: absolute;
+  padding: 6px 12px;
+  background: #fff;
+  border: 1px solid #999;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+  opacity: 0;
+  font-size: 14px;
+}
