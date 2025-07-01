@@ -118,6 +118,21 @@ function drawChart(data) {
       tooltip.transition().duration(300).style("opacity", 0);
     });
 
+group.select(".line")
+  .attr("stroke-dasharray", function() {
+    const length = this.getTotalLength();
+    return `${length} ${length}`;
+  })
+  .attr("stroke-dashoffset", function() {
+    return this.getTotalLength();
+  })
+  .transition()
+  .duration(1000)
+  .attr("stroke-dashoffset", 0);
+
+
+
+  
   // Circles
   group.selectAll(".circle")
     .data(d => dimensions.map((dim, i) => {
