@@ -10,24 +10,39 @@
     .line { fill-opacity: 0.1; stroke-width: 2px; }
     .circle { fill-opacity: 0.7; }
   </style>
+
+
 </head>
 <body>
 <svg width="700" height="700"></svg>
 <script>
-const url = "https://raw.githubusercontent.com/bengoodmanhl/bengoodmanhl.github.io/refs/heads/main/RadarJSON.json"; // 🔁 Replace with your actual JSON URL
+const url = "https://example.com/data/banks.json"; // Replace with your actual URL
 const width = 700, height = 700;
 const radius = Math.min(width, height) / 2 - 100;
+
 const svg = d3.select("svg")
   .attr("viewBox", `0 0 ${width} ${height}`)
   .append("g")
   .attr("transform", `translate(${width / 2}, ${height / 2})`);
+
+// Tooltip
+const tooltip = d3.select("body")
+  .append("div")
+  .attr("class", "tooltip")
+  .style("position", "absolute")
+  .style("padding", "6px 12px")
+  .style("background", "#fff")
+  .style("border", "1px solid #999")
+  .style("border-radius", "4px")
+  .style("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
+  .style("pointer-events", "none")
+  .style("opacity", 0);
 
 d3.json(url).then(data => {
   const dimensions = Object.keys(data[0]).filter(d => d !== "name");
   const angleSlice = (2 * Math.PI) / dimensions.length;
   const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-  // Normalize data
   const extentByDimension = {};
   dimensions.forEach(d => {
     extentByDimension[d] = d3.extent(data, obj => obj[d]);
@@ -36,10 +51,9 @@ d3.json(url).then(data => {
   function getScaledRadius(dimension, value) {
     return d3.scaleLinear()
       .domain(extentByDimension[dimension])
-      .range([0, 0.8 * radius])(value);
+      .range([0, radius])(value);
   }
 
-  // Draw grid/web
   for (let level = 0; level <= 5; level++) {
     const r = radius * (level / 5);
     const points = dimensions.map((_, i) => {
@@ -52,7 +66,6 @@ d3.json(url).then(data => {
       .attr("stroke", "#ccc");
   }
 
-  // Axis labels
   dimensions.forEach((dim, i) => {
     const angle = angleSlice * i - Math.PI / 2;
     const x = Math.cos(angle) * (radius + 20);
@@ -64,42 +77,62 @@ d3.json(url).then(data => {
       .text(dim);
   });
 
-  // Smoothed radial line generator
   const radarLine = d3.lineRadial()
     .radius(d => d.radius)
     .angle((d, i) => i * angleSlice)
     .curve(d3.curveCardinalClosed);
 
-  data.forEach(d => {
-    const points = dimensions.map((dim, i) => {
-      return {
-        angle: i * angleSlice,
+  const group = svg.selectAll(".series")
+    .data(data)
+    .enter()
+    .append("g")
+    .attr("class", "series");
+
+  group.append("path")
+    .attr("class", "line")
+    .attr("d", d => {
+      const points = dimensions.map((dim, i) => ({
         radius: getScaledRadius(dim, d[dim])
+      }));
+      return radarLine(points);
+    })
+    .attr("stroke", d => color(d.name))
+    .attr("fill", d => color(d.name))
+    .attr("fill-opacity", 0.1)
+    .attr("stroke-width", 2)
+    .on("mouseover", function(event, d) {
+      d3.selectAll(".line").attr("fill-opacity", 0.05);
+      d3.select(this).attr("fill-opacity", 0.3);
+
+      tooltip.transition().duration(200).style("opacity", 1);
+      tooltip.html(`<strong>${d.name}</strong>`)
+             .style("left", (event.pageX + 10) + "px")
+             .style("top", (event.pageY - 28) + "px");
+    })
+    .on("mouseout", function() {
+      d3.selectAll(".line").attr("fill-opacity", 0.1);
+      tooltip.transition().duration(300).style("opacity", 0);
+    });
+
+  group.selectAll(".circle")
+    .data(d => dimensions.map((dim, i) => {
+      const angle = angleSlice * i - Math.PI / 2;
+      const r = getScaledRadius(dim, d[dim]);
+      return {
+        x: Math.cos(angle) * r,
+        y: Math.sin(angle) * r,
+        color: color(d.name)
       };
-    });
-
-    // Draw filled path
-    svg.append("path")
-      .attr("d", radarLine(points))
-      .attr("stroke", color(d.name))
-      .attr("fill", color(d.name))
-      .attr("fill-opacity", 0.1)
-      .attr("stroke-width", 2)
-      .attr("class", "line");
-
-    // Draw points
-    points.forEach(p => {
-      const x = Math.cos(p.angle - Math.PI / 2) * p.radius;
-      const y = Math.sin(p.angle - Math.PI / 2) * p.radius;
-      svg.append("circle")
-        .attr("cx", x)
-        .attr("cy", y)
-        .attr("r", 3)
-        .attr("fill", color(d.name))
-        .attr("class", "circle");
-    });
-  });
+    }))
+    .enter()
+    .append("circle")
+    .attr("class", "circle")
+    .attr("r", 3)
+    .attr("cx", d => d.x)
+    .attr("cy", d => d.y)
+    .attr("fill", d => d.color);
 });
 </script>
+
 </body>
 </html>
