@@ -136,8 +136,17 @@ series.merge(seriesEnter).select(".line")
   .on("mouseout", () => {
     container.selectAll(".series").transition().duration(300).style("opacity", 1);
     tooltip.transition().duration(300).style("opacity", 0);
-  });
-
+  })
+     .each(function() {Add commentMore actions
+      const path = d3.select(this);
+      const length = this.getTotalLength();
+      path
+        .attr("stroke-dasharray", `${length} ${length}`)
+        .attr("stroke-dashoffset", length)
+        .transition()
+        .duration(1000)
+        .attr("stroke-dashoffset", 0);
+    });
    
   // Pop-in circles
   group.selectAll(".circle")
