@@ -80,7 +80,7 @@ d3.json(url).then(data => {
   const radarLine = d3.lineRadial()
     .radius(d => d.radius)
     .angle((d, i) => i * angleSlice)
-    .curve(d3.curveCardinalClosed.tension(0.3));
+    .curve(d3.curveCardinalClosed.tension(0.9));
 
   const group = svg.selectAll(".series")
     .data(data)
