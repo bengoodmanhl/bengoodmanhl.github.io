@@ -6,7 +6,9 @@ export function drawRadarChart({ data, elementId, size = 500 }) {
   const height = size;
   const radius = Math.min(width, height) / 2 - 60;
   const center = { x: width / 2, y: height / 2 };
-  const features = Object.keys(data[0]).filter(k => k !== "name");
+  const checkboxes = Array.from(document.querySelectorAll('#axisSelector input:checked'));
+const features = checkboxes.map(cb => cb.value);
+
   const angleSlice = (2 * Math.PI) / features.length;
   const scale = d3.scaleLinear().domain([-3, 3]).range([0, radius]);
 
