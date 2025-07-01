@@ -36,7 +36,7 @@ d3.json(url).then(data => {
   function getScaledRadius(dimension, value) {
     return d3.scaleLinear()
       .domain(extentByDimension[dimension])
-      .range([0, radius])(value);
+      .range([0, 1.1 * radius])(value);
   }
 
   // Draw grid/web
