@@ -1,5 +1,5 @@
 // Radar.js
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
 
 export function drawRadarChart({ data, elementId, size = 500 }) {
   if (!data || data.length === 0) return;
