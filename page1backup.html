@@ -2,27 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Smoothed Radar Chart from JSON</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Responsive Smoothed Radar Chart</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
-  <style>
-    body { font-family: sans-serif; background: #f9f9f9; }
-    .axisLabel { font-size: 12px; fill: #333; text-anchor: middle; }
-    .line { fill-opacity: 0.1; stroke-width: 2px; }
-    .circle { fill-opacity: 0.6; }
-    .tooltip {
-      position: absolute;
-      padding: 6px 12px;
-      background: #fff;
-      border: 1px solid #999;
-      border-radius: 4px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      pointer-events: none;
-      opacity: 0;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <svg width="700" height="700"></svg>
+  <div class="chart-container">
+    <svg viewBox="0 0 700 700" preserveAspectRatio="xMidYMid meet"></svg>
+  </div>
   <script src="radarChart.js"></script>
 </body>
 </html>
