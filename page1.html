@@ -8,7 +8,7 @@
     body { font-family: sans-serif; background: #f9f9f9; }
     .axisLabel { font-size: 12px; fill: #333; text-anchor: middle; }
     .line { fill-opacity: 0.1; stroke-width: 2px; }
-    .circle { fill-opacity: 0.7; }
+    .circle { fill-opacity: 0.6; }
   </style>
 
 
@@ -51,7 +51,7 @@ d3.json(url).then(data => {
   function getScaledRadius(dimension, value) {
     return d3.scaleLinear()
       .domain(extentByDimension[dimension])
-      .range([0, radius])(value);
+      .range([0, 0.8 * radius])(value);
   }
 
   for (let level = 0; level <= 5; level++) {
@@ -100,19 +100,36 @@ d3.json(url).then(data => {
     .attr("fill", d => color(d.name))
     .attr("fill-opacity", 0.1)
     .attr("stroke-width", 2)
-    .on("mouseover", function(event, d) {
-      d3.selectAll(".line").attr("fill-opacity", 0.05);
-      d3.select(this).attr("fill-opacity", 0.3);
 
-      tooltip.transition().duration(200).style("opacity", 1);
-      tooltip.html(`<strong>${d.name}</strong>`)
-             .style("left", (event.pageX + 10) + "px")
-             .style("top", (event.pageY - 28) + "px");
-    })
-    .on("mouseout", function() {
-      d3.selectAll(".line").attr("fill-opacity", 0.1);
-      tooltip.transition().duration(300).style("opacity", 0);
-    });
+
+    
+.on("mouseover", function(event, d) {
+  // Dim all other series
+  svg.selectAll(".series")
+    .transition().duration(200)
+    .style("opacity", 0.1);
+
+  // Highlight current series
+  d3.select(this.parentNode)
+    .transition().duration(200)
+    .style("opacity", 1);
+
+  // Show tooltip
+  tooltip.transition().duration(200).style("opacity", 1);
+  tooltip.html(`<strong>${d.name}</strong>`)
+         .style("left", (event.pageX + 10) + "px")
+         .style("top", (event.pageY - 28) + "px");
+})
+.on("mouseout", function() {
+  // Reset all series
+  svg.selectAll(".series")
+    .transition().duration(300)
+    .style("opacity", 1);
+
+  // Hide tooltip
+  tooltip.transition().duration(300).style("opacity", 0);
+});
+
 
   group.selectAll(".circle")
     .data(d => dimensions.map((dim, i) => {
