@@ -129,13 +129,23 @@ function addChangeListeners() {
   dropdownIds.forEach(id => {
     document.getElementById(id).addEventListener('change', () => {
       dropdownIds.forEach(updateDropdownOptions);
-
-      const selectedNormalized = getSelectedNormalizedData();
-      drawRadarChart({
-        data: selectedNormalized,
-        elementId: 'radarChart',
-        size: 500
-      });
+      updateRadarWithSelectedAxes(); // 🔁 Call this instead of manually redrawing
     });
   });
+
+  // Also listen to axis checkboxes
+  const axisCheckboxes = document.querySelectorAll('#axisSelector input[type="checkbox"]');
+  axisCheckboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', updateRadarWithSelectedAxes);
+  });
+
+  function updateRadarWithSelectedAxes() {
+  const selectedNormalized = getSelectedNormalizedData();
+  drawRadarChart({
+    data: selectedNormalized,
+    elementId: 'radarChart',
+    size: 500
+  });
 }
+
+
