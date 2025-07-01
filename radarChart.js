@@ -1,106 +1,82 @@
-function drawRadarChart(normalized) {
-  const svg = d3.select('#radarChart');
-  svg.selectAll('*').remove(); // Clear previous chart
+// Radar.js
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
-  const MIN_BANKS = 3;
-  if (!normalized || normalized.length < MIN_BANKS) return;
+export function drawRadarChart({ data, elementId, size = 500 }) {
+  if (!data || data.length === 0) return;
 
-  const size = 280;
-  const radius = size;
-  const width = +svg.attr('width');
-  const height = +svg.attr('height');
+  const svg = d3.select(`#${elementId}`);
+  svg.selectAll("*").remove(); // Clear existing content
+
+  const width = size;
+  const height = size;
+  const radius = Math.min(width, height) / 2 - 60;
   const center = { x: width / 2, y: height / 2 };
 
-  const axes = Object.keys(normalized [0]).filter(k => k !== 'name');
-  const angleSlice = (2 * Math.PI) / axes.length;
+  const features = Object.keys(data[0]).filter(k => k !== "name");
+  const angleSlice = (2 * Math.PI) / features.length;
 
-  // Scales
-  const radialScale = d3.scaleLinear().domain([0, 1]).range([0, radius]);
+  const scale = d3.scaleLinear().domain([-3, 3]).range([0, radius]);
 
-  // Grid
+  // Create radial grid lines
   const levels = 5;
+  const levelFactor = radius / levels;
+
   for (let level = 1; level <= levels; level++) {
-    const r = (radius / levels) * level;
-    svg.append('circle')
-      .attr('cx', center.x)
-      .attr('cy', center.y)
-      .attr('r', r)
-      .attr('fill', 'none')
-      .attr('stroke', '#ccc')
-      .attr('stroke-dasharray', '2,2');
+    const r = level * levelFactor;
+    svg.append("circle")
+      .attr("cx", center.x)
+      .attr("cy", center.y)
+      .attr("r", r)
+      .attr("stroke", "#ddd")
+      .attr("fill", "none");
   }
 
-  // Axis lines and labels
-  axes.forEach((axis, i) => {
+  // Axes & labels
+  features.forEach((feature, i) => {
     const angle = angleSlice * i - Math.PI / 2;
-    const x = center.x + radialScale(1) * Math.cos(angle);
-    const y = center.y + radialScale(1) * Math.sin(angle);
+    const x = center.x + radius * Math.cos(angle);
+    const y = center.y + radius * Math.sin(angle);
 
-    // Line
-    svg.append('line')
-      .attr('x1', center.x)
-      .attr('y1', center.y)
-      .attr('x2', x)
-      .attr('y2', y)
-      .attr('stroke', '#333');
+    svg.append("line")
+      .attr("x1", center.x)
+      .attr("y1", center.y)
+      .attr("x2", x)
+      .attr("y2", y)
+      .attr("stroke", "#999");
 
-    // Label
-    svg.append('text')
-      .attr('x', center.x + radialScale(1.1) * Math.cos(angle))
-      .attr('y', center.y + radialScale(1.1) * Math.sin(angle))
-      .attr('text-anchor', 'middle')
-      .attr('dominant-baseline', 'central')
-      .attr('font-size', '11px')
-      .text(axis);
+    svg.append("text")
+      .attr("x", x)
+      .attr("y", y)
+      .attr("dy", "0.35em")
+      .attr("text-anchor", x < center.x ? "end" : "start")
+      .style("font-size", "11px")
+      .text(feature);
   });
 
-  // Color helper
+  // Line generator
+  const radarLine = d3.lineRadial()
+    .angle((d, i) => i * angleSlice)
+    .radius(d => scale(d.value))
+    .curve(d3.curveLinearClosed);
+
   const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-  // Draw lines
-  normalized.forEach((bank, idx) => {
-    const points = axes.map((axis, i) => {
-      const angle = angleSlice * i - Math.PI / 2;
-      const r = radialScale(bank[axis]);
-      return [
-        center.x + r * Math.cos(angle),
-        center.y + r * Math.sin(angle)
-      ];
-    });
+  data.forEach((bank, idx) => {
+    const points = features.map(f => ({ axis: f, value: bank[f] }));
 
-    // Closed path
-    svg.append('path')
-      .datum(points)
-      .attr('fill', color(bank.name))
-      .attr('fill-opacity', 0.1)
-      .attr('stroke', color(bank.name))
-      .attr('stroke-width', 2)
-      .attr('d', d3.line().curve(d3.curveLinearClosed));
+    svg.append("path")
+      .attr("transform", `translate(${center.x},${center.y})`)
+      .attr("d", radarLine(points))
+      .attr("stroke", color(idx))
+      .attr("fill", color(idx))
+      .attr("fill-opacity", 0.2)
+      .attr("stroke-width", 2);
 
-    // Dots
-    points.forEach(p => {
-      svg.append('circle')
-        .attr('cx', p[0])
-        .attr('cy', p[1])
-        .attr('r', 3)
-        .attr('fill', color(bank.name));
-    });
-  });
-
-  // Legend
-  normalized.forEach((bank, i) => {
-    svg.append('circle')
-      .attr('cx', 10)
-      .attr('cy', 20 + i * 20)
-      .attr('r', 5)
-      .attr('fill', color(bank.name));
-
-    svg.append('text')
-      .attr('x', 20)
-      .attr('y', 20 + i * 20)
-      .attr('alignment-baseline', 'middle')
-      .text(bank.name)
-      .attr('font-size', '12px');
+    svg.append("text")
+      .attr("x", width - 100)
+      .attr("y", 20 + idx * 15)
+      .attr("fill", color(idx))
+      .style("font-size", "12px")
+      .text(bank.name);
   });
 }
-
