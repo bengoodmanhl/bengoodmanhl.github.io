@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bank Selector</title>
+</head>
+<body>
+  <h2>Select Banks</h2>
+
+  <!-- 5 Dropdowns -->
+  <select id="bankSelect1"></select>
+  <select id="bankSelect2"></select>
+  <select id="bankSelect3"></select>
+  <select id="bankSelect4"></select>
+  <select id="bankSelect5"></select>
+
+  <script>
+    // Replace this URL with your actual data source
+    const dataUrl = 'https://your-data-source.com/banks-data.json';
+
+    // List of dropdown IDs
+    const dropdowns = [
+      'bankSelect1',
+      'bankSelect2',
+      'bankSelect3',
+      'bankSelect4',
+      'bankSelect5'
+    ];
+
+    // Fetch and populate dropdowns
+    fetch(dataUrl)
+      .then(response => response.json())
+      .then(data => {
+        const bankNames = data.map(bank => bank.name);
+        dropdowns.forEach(id => populateDropdown(id, bankNames));
+      })
+      .catch(error => console.error('Error loading bank data:', error));
+
+    // Helper function to fill a dropdown with bank options
+    function populateDropdown(id, options) {
+      const select = document.getElementById(id);
+      options.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.text = name;
+        select.appendChild(option);
+      });
+    }
+  </script>
+</body>
+</html>
