@@ -1,139 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Smoothed D3.js Radar Chart</title>
-
+  <meta charset="UTF-8">
+  <title>Radar Chart from JSON</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
   <style>
-    body {
-      font-family: 'Open Sans', sans-serif;
-      font-size: 11px;
-      font-weight: 300;
-      fill: #242424;
-      text-align: center;
-      cursor: default;
-    }
-
-    .tooltip {
-      fill: #333333;
-    }
+    body { font-family: sans-serif; background: #f9f9f9; }
+    .axisLabel { font-size: 12px; fill: #333; text-anchor: middle; }
+    .line { fill-opacity: 0.1; stroke-width: 2px; }
+    .circle { fill-opacity: 0.7; }
   </style>
-
-  <!-- D3.js v3 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
 </head>
 <body>
-  <h2>Select Two Banks</h2>
+<svg width="700" height="700"></svg>
+<script>
+const url = "https://example.com/data/banks.json"; // Replace with your actual JSON URL
+const width = 700, height = 700;
+const svg = d3.select("svg")
+  .attr("viewBox", `0 0 ${width} ${height}`)
+  .append("g")
+  .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
-  <label for="dropdown1">Bank 1:</label>
-  <select id="dropdown1">
-    <option value="Bank1">Bank1</option>
-    <option value="Bank2">Bank2</option>
-    <option value="Bank3">Bank3</option>
-    <option value="Bank4">Bank4</option>
-  </select>
+d3.json(url).then(data => {
+  const dimensions = Object.keys(data[0]).filter(d => d !== "name");
+  const radius = Math.min(width, height) / 2 - 100;
+  const angleSlice = (2 * Math.PI) / dimensions.length;
+  const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-  <label for="dropdown2">Bank 2:</label>
-  <select id="dropdown2">
-    <option value="Bank1">Bank1</option>
-    <option value="Bank2">Bank2</option>
-    <option value="Bank3">Bank3</option>
-    <option value="Bank4">Bank4</option>
-  </select>
+  const extentByDimension = {};
+  dimensions.forEach(d => {
+    extentByDimension[d] = d3.extent(data, obj => obj[d]);
+  });
 
-  <div class="radarChart"></div>
+  function getPosition(dimension, value) {
+    const scale = d3.scaleLinear()
+      .domain(extentByDimension[dimension])
+      .range([0, radius]);
+    const i = dimensions.indexOf(dimension);
+    const angle = angleSlice * i - Math.PI / 2;
+    return [Math.cos(angle) * scale(value), Math.sin(angle) * scale(value)];
+  }
 
-  <!-- Your radarChart.js should define RadarChart() globally -->
-  <script src="radarChart.js"></script>
+  for (let level = 0; level <= 5; level++) {
+    const r = radius * (level / 5);
+    const points = dimensions.map((d, i) => {
+      const angle = angleSlice * i - Math.PI / 2;
+      return [Math.cos(angle) * r, Math.sin(angle) * r];
+    });
+    svg.append("polygon")
+      .attr("points", points.map(d => d.join(",")).join(" "))
+      .attr("fill", "none")
+      .attr("stroke", "#ccc");
+  }
 
-  <script>
-    const margin = { top: 100, right: 100, bottom: 100, left: 100 },
-          width = Math.min(700, window.innerWidth - 10) - margin.left - margin.right,
-          height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
+  dimensions.forEach((dim, i) => {
+    const angle = angleSlice * i - Math.PI / 2;
+    const x = Math.cos(angle) * (radius + 20);
+    const y = Math.sin(angle) * (radius + 20);
+    svg.append("text")
+      .attr("class", "axisLabel")
+      .attr("x", x)
+      .attr("y", y)
+      .text(dim);
+  });
 
-    const color = d3.scale.ordinal()
-      .range(["#EDC951", "#CC333F", "#00A0B0"]);
+  data.forEach((d, idx) => {
+    const coordinates = dimensions.map(dim => getPosition(dim, d[dim]));
+    svg.append("polygon")
+      .attr("points", coordinates.map(p => p.join(",")).join(" "))
+      .attr("stroke", color(d.name))
+      .attr("fill", color(d.name))
+      .attr("class", "line");
 
-    const radarChartOptions = {
-      w: width,
-      h: height,
-      margin: margin,
-      maxValue: 3.5,
-      levels: 5,
-      roundStrokes: true,
-      color: color
-    };
-
-    const data = [
-      [
-        { "name": "Bank1", "value": 0 },
-        { "axis": "Complaints per 1000", "value": 0.66 },
-        { "axis": "Closed", "value": 3.45 },
-        { "axis": "Upheld%", "value": 3.27 },
-        { "axis": "Closed 8 weeks+%", "value": 2.65 },
-        { "axis": "FOS new cases#", "value": 0.66 },
-        { "axis": "FOS Upheld%", "value": 0.81 },
-        { "axis": "FOS cases per 1m", "value": 1.13 }
-      ],
-      [
-        { "name": "Bank2", "value": 0 },
-        { "axis": "Complaints per 1000", "value": 1.11 },
-        { "axis": "Closed", "value": 1.46 },
-        { "axis": "Upheld%", "value": 1.32 },
-        { "axis": "Closed 8 weeks+%", "value": 1.87 },
-        { "axis": "FOS new cases#", "value": 1.11 },
-        { "axis": "FOS Upheld%", "value": 1.42 },
-        { "axis": "FOS cases per 1m", "value": 0.82 }
-      ],
-      [
-        { "name": "Bank3", "value": 0 },
-        { "axis": "Complaints per 1000", "value": 0.71 },
-        { "axis": "Closed", "value": 1.94 },
-        { "axis": "Upheld%", "value": 2.07 },
-        { "axis": "Closed 8 weeks+%", "value": 1.59 },
-        { "axis": "FOS new cases#", "value": 0.71 },
-        { "axis": "FOS Upheld%", "value": 0.77 },
-        { "axis": "FOS cases per 1m", "value": 0.86 }
-      ],
-      [
-        { "name": "Bank4", "value": 0 },
-        { "axis": "Complaints per 1000", "value": 0.84 },
-        { "axis": "Closed", "value": 1.15 },
-        { "axis": "Upheld%", "value": 1.21 },
-        { "axis": "Closed 8 weeks+%", "value": 1.12 },
-        { "axis": "FOS new cases#", "value": 0.84 },
-        { "axis": "FOS Upheld%", "value": 0.93 },
-        { "axis": "FOS cases per 1m", "value": 1.57 }
-      ]
-    ];
-
-    const dropdown1 = document.getElementById("dropdown1");
-    const dropdown2 = document.getElementById("dropdown2");
-
-    dropdown1.addEventListener("change", updateBankList);
-    dropdown2.addEventListener("change", updateBankList);
-
-    function updateBankList() {
-      const bank1 = dropdown1.value;
-      const bank2 = dropdown2.value;
-
-      const names = Array.from(new Set([bank1, bank2]));
-      const filtered = data.filter(bankArray => {
-        const nameObj = bankArray.find(item => item.name);
-        return nameObj && names.includes(nameObj.name);
-      });
-
-      console.clear();
-      console.log("Selected banks:", names);
-      console.log("Filtered data:", filtered);
-
-      d3.select(".radarChart").selectAll("*").remove(); // clear chart before redrawing
-
-      RadarChart(".radarChart", filtered, radarChartOptions);
-    }
-
-    // Initial chart draw
-    updateBankList();
-  </script>
+    coordinates.forEach(p => {
+      svg.append("circle")
+        .attr("cx", p[0])
+        .attr("cy", p[1])
+        .attr("r", 3)
+        .attr("fill", color(d.name))
+        .attr("class", "circle");
+    });
+  });
+});
+</script>
 </body>
 </html>
