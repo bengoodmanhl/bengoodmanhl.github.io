@@ -38,6 +38,14 @@
     // Helper function to fill a dropdown with bank options
     function populateDropdown(id, options) {
       const select = document.getElementById(id);
+      
+      // Add the 'None' option first
+    const noneOption = document.createElement('option');
+    noneOption.value = '';
+    noneOption.text = 'None';
+    select.appendChild(noneOption);
+      
+      
       options.forEach(name => {
         const option = document.createElement('option');
         option.value = name;
