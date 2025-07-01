@@ -51,6 +51,8 @@ fetch(dataUrl)
     // 🚫 Disable already-selected options in other dropdowns
     dropdownIds.forEach(updateDropdownOptions);
 
+   
+    //for checkboxes
     const features = Object.keys(data[0]).filter(k => k !== 'name');
 createAxisCheckboxes(features);
 
