@@ -9,6 +9,7 @@ let allData, dimensions, extentByDimension;
 const tooltip = d3.select("body").append("div").attr("class", "tooltip");
 
 d3.json(url).then(data => {
+  console.log("Loaded data:", data);
   allData = data;
   dimensions = Object.keys(data[0]).filter(k => k !== "name");
   extentByDimension = {};
