@@ -4,9 +4,9 @@
   <title>Bank Selector</title>
 </head>
 <body>
-  <h2>Select Banks</h2>
+  <h2>Select Up to 5 Banks</h2>
 
-  <!-- 5 Dropdowns -->
+  <!-- Dropdowns -->
   <select id="bankSelect1"></select>
   <select id="bankSelect2"></select>
   <select id="bankSelect3"></select>
@@ -14,43 +14,73 @@
   <select id="bankSelect5"></select>
 
   <script>
-    // Replace this URL with your actual data source
-    const dataUrl = 'https://raw.githubusercontent.com/bengoodmanhl/bengoodmanhl.github.io/refs/heads/main/RadarJSON.json';
+    const dataUrl = 'https://your-data-source.com/banks-data.json'; // 🔁 Replace with your actual URL
+    const dropdownIds = ['bankSelect1', 'bankSelect2', 'bankSelect3', 'bankSelect4', 'bankSelect5'];
+    let allBanksData = [];
 
-    // List of dropdown IDs
-    const dropdowns = [
-      'bankSelect1',
-      'bankSelect2',
-      'bankSelect3',
-      'bankSelect4',
-      'bankSelect5'
-    ];
-
-    // Fetch and populate dropdowns
+    // Fetch bank data and initialize dropdowns
     fetch(dataUrl)
-      .then(response => response.json())
+      .then(res => res.json())
       .then(data => {
+        allBanksData = data;
         const bankNames = data.map(bank => bank.name);
-        dropdowns.forEach(id => populateDropdown(id, bankNames));
+        dropdownIds.forEach(id => populateDropdown(id, bankNames));
+        addChangeListeners();
       })
-      .catch(error => console.error('Error loading bank data:', error));
+      .catch(err => console.error('Failed to fetch bank data:', err));
 
-    // Helper function to fill a dropdown with bank options
+    // Populate a dropdown with all bank names + "None"
     function populateDropdown(id, options) {
       const select = document.getElementById(id);
-      
-      // Add the 'None' option first
-    const noneOption = document.createElement('option');
-    noneOption.value = '';
-    noneOption.text = 'None';
-    select.appendChild(noneOption);
-      
-      
+      select.innerHTML = ''; // clear existing options
+
+      const none = document.createElement('option');
+      none.value = '';
+      none.text = 'None';
+      select.appendChild(none);
+
       options.forEach(name => {
-        const option = document.createElement('option');
-        option.value = name;
-        option.text = name;
-        select.appendChild(option);
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.text = name;
+        select.appendChild(opt);
+      });
+    }
+
+    // Get other selected bank names (excluding current select)
+    function getSelectedBanks(currentId) {
+      return dropdownIds
+        .filter(id => id !== currentId)
+        .map(id => document.getElementById(id).value)
+        .filter(name => name); // ignore empty values
+    }
+
+    // Disable already-selected banks in each dropdown
+    function updateDropdownOptions(currentId) {
+      const selectedOthers = getSelectedBanks(currentId);
+      const currentSelect = document.getElementById(currentId);
+      Array.from(currentSelect.options).forEach(option => {
+        option.disabled = selectedOthers.includes(option.value);
+      });
+    }
+
+    // Get selected banks’ full data
+    function getSelectedBankData() {
+      const selectedNames = dropdownIds
+        .map(id => document.getElementById(id).value)
+        .filter(name => name);
+      return allBanksData.filter(bank => selectedNames.includes(bank.name));
+    }
+
+    // Set up event listeners on dropdowns
+    function addChangeListeners() {
+      dropdownIds.forEach(id => {
+        const select = document.getElementById(id);
+        select.addEventListener('change', () => {
+          dropdownIds.forEach(updateDropdownOptions); // Refresh all dropdowns
+          const selectedBankData = getSelectedBankData();
+          console.log('Selected Bank Data:', selectedBankData);
+        });
       });
     }
   </script>
