@@ -10,16 +10,19 @@ export function drawRadarChart({ data, elementId, size = 500 }) {
   const angleSlice = (2 * Math.PI) / features.length;
   const scale = d3.scaleLinear().domain([-3, 3]).range([0, radius]);
 
-  // Draw circles
-  const levels = 5;
-  for (let level = 1; level <= levels; level++) {
-    svg.append("circle")
-      .attr("cx", center.x)
-      .attr("cy", center.y)
-      .attr("r", (level / levels) * radius)
-      .attr("stroke", "#ddd")
-      .attr("fill", "none");
-  }
+// 3 circles standard deviation
+const levelsToDraw = [-1, 0, 1];
+const levelColors = { '-1': '#ff9999', '0': '#cccccc', '1': '#99ccff' };
+levelsToDraw.forEach(level => {
+  svg.append("circle")
+    .attr("cx", center.x)
+    .attr("cy", center.y)
+    .attr("r", scale(level))
+    .attr("stroke", levelColors[level])
+    .attr("fill", "none")
+    .attr("stroke-width", level === 0 ? 2 : 1)
+    .attr("stroke-dasharray", level === 0 ? "2,2" : null);
+});
 
   // Axes
   features.forEach((feature, i) => {
