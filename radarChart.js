@@ -1,37 +1,27 @@
-// Radar.js
-
-
 export function drawRadarChart({ data, elementId, size = 500 }) {
-  if (!data || data.length === 0) return;
-
   const svg = d3.select(`#${elementId}`);
-  svg.selectAll("*").remove(); // Clear existing content
+  svg.selectAll('*').remove();
 
   const width = size;
   const height = size;
   const radius = Math.min(width, height) / 2 - 60;
   const center = { x: width / 2, y: height / 2 };
-
   const features = Object.keys(data[0]).filter(k => k !== "name");
   const angleSlice = (2 * Math.PI) / features.length;
-
   const scale = d3.scaleLinear().domain([-3, 3]).range([0, radius]);
 
-  // Create radial grid lines
+  // Draw circles
   const levels = 5;
-  const levelFactor = radius / levels;
-
   for (let level = 1; level <= levels; level++) {
-    const r = level * levelFactor;
     svg.append("circle")
       .attr("cx", center.x)
       .attr("cy", center.y)
-      .attr("r", r)
+      .attr("r", (level / levels) * radius)
       .attr("stroke", "#ddd")
       .attr("fill", "none");
   }
 
-  // Axes & labels
+  // Axes
   features.forEach((feature, i) => {
     const angle = angleSlice * i - Math.PI / 2;
     const x = center.x + radius * Math.cos(angle);
@@ -42,7 +32,7 @@ export function drawRadarChart({ data, elementId, size = 500 }) {
       .attr("y1", center.y)
       .attr("x2", x)
       .attr("y2", y)
-      .attr("stroke", "#999");
+      .attr("stroke", "#aaa");
 
     svg.append("text")
       .attr("x", x)
@@ -53,29 +43,26 @@ export function drawRadarChart({ data, elementId, size = 500 }) {
       .text(feature);
   });
 
-  // Line generator
-  const radarLine = d3.lineRadial()
+  const color = d3.scaleOrdinal(d3.schemeCategory10);
+  const lineGen = d3.lineRadial()
     .angle((d, i) => i * angleSlice)
     .radius(d => scale(d.value))
     .curve(d3.curveLinearClosed);
 
-  const color = d3.scaleOrdinal(d3.schemeCategory10);
-
-  data.forEach((bank, idx) => {
-    const points = features.map(f => ({ axis: f, value: bank[f] }));
-
+  data.forEach((bank, i) => {
+    const values = features.map(f => ({ axis: f, value: bank[f] }));
     svg.append("path")
       .attr("transform", `translate(${center.x},${center.y})`)
-      .attr("d", radarLine(points))
-      .attr("stroke", color(idx))
-      .attr("fill", color(idx))
+      .attr("d", lineGen(values))
+      .attr("stroke", color(i))
+      .attr("fill", color(i))
       .attr("fill-opacity", 0.2)
       .attr("stroke-width", 2);
 
     svg.append("text")
-      .attr("x", width - 100)
-      .attr("y", 20 + idx * 15)
-      .attr("fill", color(idx))
+      .attr("x", width - 150)
+      .attr("y", 20 + i * 14)
+      .attr("fill", color(i))
       .style("font-size", "12px")
       .text(bank.name);
   });
