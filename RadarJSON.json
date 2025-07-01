@@ -1,50 +1,30 @@
 [
-  {
-    "name": "HSBC HOLDINGS PLC",
-    "Complaints per 1000": 3.2,
-    "Upheld%": 0.6,
-    "Closed 8 weeks+%": 0.0,
-    "FOS Upheld%": 0.3,
-    "FOS cases per 1m": 112.1
-  },
-  {
-    "name": "THE ROYAL BANK OF SCOTLAND GROUP",
-    "Complaints per 1000": 2.8,
-    "Upheld%": 0.6,
-    "Closed 8 weeks+%": 0.0,
-    "FOS Upheld%": 0.4,
-    "FOS cases per 1m": 91.1
-  },
-  {
-    "name": "NATIONWIDE BUILDING SOCIETY",
-    "Complaints per 1000": 2.3,
-    "Upheld%": 0.6,
-    "Closed 8 weeks+%": 0.1,
-    "FOS Upheld%": 0.3,
-    "FOS cases per 1m": 60.8
-  },
-  {
-    "name": "BARCLAYS PLC",
-    "Complaints per 1000": 2.1,
-    "Upheld%": 0.6,
-    "Closed 8 weeks+%": 0.0,
-    "FOS Upheld%": 0.4,
-    "FOS cases per 1m": 117.5
-  },
-  {
-    "name": "BANCO SANTANDER SA",
-    "Complaints per 1000": 2.5,
-    "Upheld%": 0.5,
-    "Closed 8 weeks+%": 0.0,
-    "FOS Upheld%": 0.3,
-    "FOS cases per 1m": 213.4
-  },
-  {
-    "name": "MONZO BANK LIMITED",
-    "Complaints per 1000": 3.8,
-    "Upheld%": 0.3,
-    "Closed 8 weeks+%": 0.2,
-    "FOS Upheld%": 0.4,
-    "FOS cases per 1m": 228.8
-  }
-]
+  {"name": "HSBC HOLDINGS PLC", "Complaints per 1000": 0.55, "Upheld%": 1.19, "Closed 8 weeks": 0.15, "FOS Upheld%": 1.36, "FOS cases per 1m": 0.23},
+  {"name": "THE ROYAL BANK OF SCOTLAND GROUP", "Complaints per 1000": 0.47, "Upheld%": 1.25, "Closed 8 weeks": 2.11, "FOS Upheld%": 1.51, "FOS cases per 1m": 0.19},
+  {"name": "NATIONWIDE BUILDING SOCIETY", "Complaints per 1000": 0.40, "Upheld%": 1.19, "Closed 8 weeks": 3.04, "FOS Upheld%": 1.19, "FOS cases per 1m": 0.13},
+  {"name": "BARCLAYS PLC", "Complaints per 1000": 0.35, "Upheld%": 1.21, "Closed 8 weeks": 0.52, "FOS Upheld%": 1.47, "FOS cases per 1m": 0.24},
+  {"name": "BANCO SANTANDER SA", "Complaints per 1000": 0.42, "Upheld%": 0.95, "Closed 8 weeks": 0.21, "FOS Upheld%": 1.39, "FOS cases per 1m": 0.44},
+  {"name": "MONZO BANK LIMITED", "Complaints per 1000": 0.65, "Upheld%": 0.64, "Closed 8 weeks": 6.83, "FOS Upheld%": 1.59, "FOS cases per 1m": 0.47},
+  {"name": "PROVIDENT FINANCIAL PLC", "Complaints per 1000": 3.42, "Upheld%": 0.39, "Closed 8 weeks": 2.72, "FOS Upheld%": 1.03, "FOS cases per 1m": 26.28},
+  {"name": "TSB BANKING GROUP", "Complaints per 1000": 0.56, "Upheld%": 1.30, "Closed 8 weeks": 0.57, "FOS Upheld%": 1.25, "FOS cases per 1m": 0.18},
+  {"name": "CAPITAL ONE FINANCIAL CORP", "Complaints per 1000": 0.78, "Upheld%": 0.62, "Closed 8 weeks": 0.43, "FOS Upheld%": 0.94, "FOS cases per 1m": 0.49},
+  {"name": "STARLING BANK LIMITED", "Complaints per 1000": 0.87, "Upheld%": 0.85, "Closed 8 weeks": 0.04, "FOS Upheld%": 0.89, "FOS cases per 1m": 0.35},
+  {"name": "JPMORGAN CHASE & CO", "Complaints per 1000": 0.28, "Upheld%": 0.80, "Closed 8 weeks": 0.01, "FOS Upheld%": 1.35, "FOS cases per 1m": 0.13},
+  {"name": "CO-OPERATIVE GROUP LIMITED", "Complaints per 1000": 0.51, "Upheld%": 1.33, "Closed 8 weeks": 4.44, "FOS Upheld%": 2.02, "FOS cases per 1m": 0.24},
+  {"name": "AMERICAN EXPRESS", "Complaints per 1000": 0.63, "Upheld%": 0.65, "Closed 8 weeks": 0.00, "FOS Upheld%": 1.41, "FOS cases per 1m": 0.52},
+  {"name": "METRO BANK PLC", "Complaints per 1000": 0.54, "Upheld%": 0.85, "Closed 8 weeks": 0.08, "FOS Upheld%": 1.69, "FOS cases per 1m": 0.41},
+  {"name": "J SAINSBURY PLC", "Complaints per 1000": 0.29, "Upheld%": 0.74, "Closed 8 weeks": 0.78, "FOS Upheld%": 1.20, "FOS cases per 1m": 0.12},
+  {"name": "BNP PARIBAS", "Complaints per 1000": 0.42, "Upheld%": 0.68, "Closed 8 weeks": 4.51, "FOS Upheld%": 2.15, "FOS cases per 1m": 0.54},
+  {"name": "ClearBank Limited", "Complaints per 1000": 0.36, "Upheld%": 1.15, "Closed 8 weeks": 0.05, "FOS Upheld%": 1.23, "FOS cases per 1m": 0.13},
+  {"name": "ZOPA HOLDINGS INC", "Complaints per 1000": 0.58, "Upheld%": 0.90, "Closed 8 weeks": 0.18, "FOS Upheld%": 1.29, "FOS cases per 1m": 0.91},
+  {"name": "COVENTRY BUILDING SOCIETY", "Complaints per 1000": 0.21, "Upheld%": 1.26, "Closed 8 weeks": 0.04, "FOS Upheld%": 0.00, "FOS cases per 1m": 0.01},
+  {"name": "SKIPTON BUILDING SOCIETY", "Complaints per 1000": 0.34, "Upheld%": 1.64, "Closed 8 weeks": 0.45, "FOS Upheld%": 0.00, "FOS cases per 1m": 0.05},
+  {"name": "BANK OF IRELAND GROUP PLC", "Complaints per 1000": 0.39, "Upheld%": 0.91, "Closed 8 weeks": 2.10, "FOS Upheld%": 1.96, "FOS cases per 1m": 0.59},
+  {"name": "LEEDS BUILDING SOCIETY", "Complaints per 1000": 0.35, "Upheld%": 1.21, "Closed 8 weeks": 0.05, "FOS Upheld%": 1.26, "FOS cases per 1m": 0.05},
+  {"name": "YORKSHIRE BUILDING SOCIETY", "Complaints per 1000": 0.09, "Upheld%": 1.50, "Closed 8 weeks": 0.15, "FOS Upheld%": 1.19, "FOS cases per 1m": 0.03},
+  {"name": "ONESAVINGS BANK PLC", "Complaints per 1000": 0.69, "Upheld%": 0.98, "Closed 8 weeks": 0.42, "FOS Upheld%": 0.00, "FOS cases per 1m": 0.07},
+  {"name": "DANSKE BANK A/S", "Complaints per 1000": 0.29, "Upheld%": 0.75, "Closed 8 weeks": 0.00, "FOS Upheld%": 1.02, "FOS cases per 1m": 0.09},
+  {"name": "IKANO", "Complaints per 1000": 0.71, "Upheld%": 0.68, "Closed 8 weeks": 2.28, "FOS Upheld%": 1.50, "FOS cases per 1m": 0.20},
+  {"name": "MARLIN BIDCO LIMITED", "Complaints per 1000": 0.34, "Upheld%": 1.33, "Closed 8 weeks": 0.15, "FOS Upheld%": 1.35, "FOS cases per 1m": 1.61},
+  {"name": "PARAGON BANKING GROUP PLC", "Complaints per 1000": 0.32, "Upheld%": 1.35, "Closed 8 weeks": 0.48, "FOS Upheld%": 1.78, "FOS cases per 1m": 0.22},
+  {"name": "PRINCIPALITY BUILDING SOCIETY
