@@ -1,33 +1,23 @@
-<!DOCTYPE html>
-<html>
+!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>Bank benchmarking</title>
+  <meta charset="UTF-8" />
+  <title>Bank Benchmarking</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
-
-
+  <style>
+    select { margin-right: 10px; }
+  </style>
 </head>
 <body>
   <h2>Select Up to 5 Banks</h2>
-
   <select id="bankSelect1"></select>
   <select id="bankSelect2"></select>
   <select id="bankSelect3"></select>
   <select id="bankSelect4"></select>
   <select id="bankSelect5"></select>
 
-  <svg id="radarChart" width="500" height="500"></svg>
-<script type="module">
-  import { drawRadarChart } from './radarChart.js';
+  <svg id="radarChart" width="600" height="600"></svg>
 
-  // Example: using your normalizedBankData from the page
-  drawRadarChart({
-    data: normalizedBankData,
-    elementId: 'radarChart',
-    size: 500
-  });
-</script>
-  
-  
-  <script src="dataManipulation.js"></script>
+  <script type="module" src="main.js"></script>
 </body>
 </html>
