@@ -58,6 +58,50 @@ function getScaledRadius(dimension, value) {
     .range([0, 0.9*radius])(rawValue);
 }
 
+function updateRadar(selectedNames) {
+  // Clear previous radar plots
+  svg.selectAll(".series").remove();
+
+  const filteredData = data.filter(d => selectedNames.includes(d.name));
+
+  const group = svg.selectAll(".series")
+    .data(filteredData)
+    .enter()
+    .append("g")
+    .attr("class", "series");
+
+  // (same code for path and circles, using radarLine as before)
+  group.append("path")
+    .attr("class", "line")
+    .attr("d", d => {
+      const points = dimensions.map((dim, i) => ({
+        radius: getScaledRadius(dim, d[dim])
+      }));
+      return radarLine(points);
+    })
+    .attr("stroke", d => color(d.name))
+    .attr("fill", d => color(d.name))
+    .attr("fill-opacity", 0.1)
+    .attr("stroke-width", 2);
+
+  group.selectAll(".circle")
+    .data(d => dimensions.map((dim, i) => {
+      const angle = angleSlice * i - Math.PI / 2;
+      const r = getScaledRadius(dim, d[dim]);
+      return {
+        x: Math.cos(angle) * r,
+        y: Math.sin(angle) * r,
+        color: color(d.name)
+      };
+    }))
+    .enter()
+    .append("circle")
+    .attr("class", "circle")
+    .attr("r", 3)
+    .attr("cx", d => d.x)
+    .attr("cy", d => d.y)
+    .attr("fill", d => d.color);
+}
 
   
 
@@ -162,6 +206,53 @@ data.forEach(d => {
     .attr("value", d.name)
     .text(d.name);
 });
+
+  function updateRadar(selectedNames) {
+  svg.selectAll(".series").remove();
+
+  const filteredData = data.filter(d => selectedNames.includes(d.name));
+
+  const group = svg.selectAll(".series")
+    .data(filteredData)
+    .enter()
+    .append("g")
+    .attr("class", "series");
+
+  group.append("path")
+    .attr("class", "line")
+    .attr("d", d => {
+      const points = dimensions.map((dim, i) => ({
+        radius: getScaledRadius(dim, d[dim])
+      }));
+      return radarLine(points);
+    })
+    .attr("stroke", d => color(d.name))
+    .attr("fill", d => color(d.name))
+    .attr("fill-opacity", 0.1)
+    .attr("stroke-width", 2);
+
+  group.selectAll(".circle")
+    .data(d => dimensions.map((dim, i) => {
+      const angle = angleSlice * i - Math.PI / 2;
+      const r = getScaledRadius(dim, d[dim]);
+      return {
+        x: Math.cos(angle) * r,
+        y: Math.sin(angle) * r,
+        color: color(d.name)
+      };
+    }))
+    .enter()
+    .append("circle")
+    .attr("class", "circle")
+    .attr("r", 3)
+    .attr("cx", d => d.x)
+    .attr("cy", d => d.y)
+    .attr("fill", d => d.color);
+}
+
+  
+
+  
 
 // Watch for changes and update chart
 select.on("change", function() {
