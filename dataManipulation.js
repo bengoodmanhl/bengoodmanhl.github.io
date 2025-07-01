@@ -1,4 +1,4 @@
-const dataUrl = 'https://your-data-source.com/banks-data.json'; // Replace with your real URL
+const dataUrl = 'https://raw.githubusercontent.com/bengoodmanhl/bengoodmanhl.github.io/refs/heads/main/RadarJSON.json'; // Replace with your real URL
 const dropdownIds = ['bankSelect1', 'bankSelect2', 'bankSelect3', 'bankSelect4', 'bankSelect5'];
 let allBanksData = [];
 
