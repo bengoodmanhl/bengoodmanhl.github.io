@@ -1,166 +1,140 @@
-function RadarChart(id, data, options) {
-  var cfg = {
-    w: 600,
-    h: 600,
-    margin: { top: 100, right: 100, bottom: 100, left: 100 },
-    levels: 5,
-    maxValue: 0,
-    labelFactor: 1.25,
-    wrapWidth: 60,
-    opacityArea: 0.35,
-    dotRadius: 4,
-    strokeWidth: 2,
-    roundStrokes: true,
-    color: d3.scale.category10()
-  };
-
-  // Merge custom options
-  if ('undefined' !== typeof options) {
-    for (var i in options) {
-      if (typeof options[i] !== 'undefined') cfg[i] = options[i];
-    }
-  }
-
-  var allAxis = data[0].slice(1).map(d => d.axis),
-      total = allAxis.length,
-      radius = Math.min(cfg.w / 2, cfg.h / 2),
-      angleSlice = Math.PI * 2 / total;
-
-  var maxValue = Math.max(cfg.maxValue, d3.max(data, i =>
-    d3.max(i.slice(1), o => o.value)
-  ));
-
-  // Interactive Legend
-var legendZone = svg.append("g")
-  .attr("class", "legend")
-  .attr("transform", `translate(${-(cfg.w / 2)}, ${radius + 40})`);
-
-var legend = legendZone.selectAll(".legendItem")
-  .data(data)
-  .enter()
+const url = "https://raw.githubusercontent.com/bengoodmanhl/bengoodmanhl.github.io/refs/heads/main/RadarJSON.json";
+const width = 700, height = 700;
+const radius = Math.min(width, height) / 2 - 100;
+const svg = d3.select("svg")
+  .attr("viewBox", `0 0 ${width} ${height}`)
   .append("g")
-  .attr("class", "legendItem")
-  .attr("transform", (d, i) => `translate(${i * 100}, 0)`)
-  .style("cursor", "pointer");
+  .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
-// Rectangles
-legend.append("rect")
-  .attr("width", 12)
-  .attr("height", 12)
-  .attr("fill", (d, i) => cfg.color(i))
-  .attr("stroke", "black")
-  .attr("stroke-width", 0.5);
+const tooltip = d3.select("body")
+  .append("div")
+  .attr("class", "tooltip")
+  .style("position", "absolute")
+  .style("padding", "6px 12px")
+  .style("background", "#fff")
+  .style("border", "1px solid #999")
+  .style("border-radius", "4px")
+  .style("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
+  .style("pointer-events", "none")
+  .style("opacity", 0);
 
-// Text labels
-legend.append("text")
-  .attr("x", 18)
-  .attr("y", 9)
-  .style("font-size", "11px")
-  .text((d) => d[0].name);
+d3.json(url).then(data => {
+  const dimensions = Object.keys(data[0]).filter(d => d !== "name");
+  const angleSlice = (2 * Math.PI) / dimensions.length;
+  const color = d3.scaleOrdinal(d3.schemeCategory10);
+  const extentByDimension = {};
+  dimensions.forEach(d => {
+    extentByDimension[d] = d3.extent(data, obj => obj[d]);
+  });
 
-// Legend toggle functionality
-legend.on("click", function(d, i) {
-  const area = svg.selectAll(".radarWrapper").filter((dd, j) => j === i);
-  const visible = area.style("display") !== "none";
-  area.style("display", visible ? "none" : null);
-});
-
-
-  // Remove previous chart
-  d3.select(id).select("svg").remove();
-
-  var svg = d3.select(id)
-    .append("svg")
-    .attr("width", cfg.w + cfg.margin.left + cfg.margin.right)
-    .attr("height", cfg.h + cfg.margin.top + cfg.margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + (cfg.w / 2 + cfg.margin.left) + "," + (cfg.h / 2 + cfg.margin.top) + ")");
-
-  var rScale = d3.scale.linear()
-    .range([0, radius])
-    .domain([0, maxValue]);
-
-  // Circular grid
-  for (var level = 0; level < cfg.levels; level++) {
-    var levelFactor = radius * ((level + 1) / cfg.levels);
-    svg.selectAll(".levels")
-      .data(allAxis)
-      .enter()
-      .append("line")
-      .attr("x1", (d, i) => levelFactor * Math.cos(angleSlice * i - Math.PI / 2))
-      .attr("y1", (d, i) => levelFactor * Math.sin(angleSlice * i - Math.PI / 2))
-      .attr("x2", (d, i) => levelFactor * Math.cos(angleSlice * (i + 1) - Math.PI / 2))
-      .attr("y2", (d, i) => levelFactor * Math.sin(angleSlice * (i + 1) - Math.PI / 2))
-      .attr("stroke", "gray")
-      .attr("stroke-opacity", 0.75)
-      .attr("stroke-width", "0.5px");
+  function getScaledRadius(dimension, value) {
+    const rawValue = Math.max(0.1, value);
+    return d3.scaleLinear()
+      .domain(extentByDimension[dimension])
+      .range([0, 0.9 * radius])(rawValue);
   }
 
-  // Axes
-  var axis = svg.selectAll(".axis")
-    .data(allAxis)
-    .enter().append("g")
-    .attr("class", "axis");
+  for (let level = 0; level <= 5; level++) {
+    const r = radius * (level / 5);
+    const points = dimensions.map((_, i) => {
+      const angle = angleSlice * i - Math.PI / 2;
+      return [Math.cos(angle) * r, Math.sin(angle) * r];
+    });
+    svg.append("polygon")
+      .attr("points", points.map(d => d.join(",")).join(" "))
+      .attr("fill", "none")
+      .attr("stroke", "#ccc");
+  }
 
-  axis.append("line")
-    .attr("x1", 0)
-    .attr("y1", 0)
-    .attr("x2", (d, i) => rScale(maxValue * 1.1) * Math.cos(angleSlice * i - Math.PI / 2))
-    .attr("y2", (d, i) => rScale(maxValue * 1.1) * Math.sin(angleSlice * i - Math.PI / 2))
-    .attr("stroke", "gray")
-    .attr("stroke-width", "1px");
-
-  axis.append("text")
-    .attr("x", (d, i) => rScale(maxValue * cfg.labelFactor) * Math.cos(angleSlice * i - Math.PI / 2))
-    .attr("y", (d, i) => rScale(maxValue * cfg.labelFactor) * Math.sin(angleSlice * i - Math.PI / 2))
-    .attr("dy", "0.35em")
-    .style("font-size", "11px")
-    .attr("text-anchor", "middle")
-    .text(d => d);
-
-  // Radar line generator
-  var radarLine = d3.svg.line.radial()
-    .radius(d => rScale(d.value))
-    .angle((d, i) => i * angleSlice)
-    .interpolate(cfg.roundStrokes ? "cardinal-closed" : "linear");
-
-  // Blobs
-  var blobWrapper = svg.selectAll(".radarWrapper")
-    .data(data)
-    .enter().append("g")
-    .attr("class", "radarWrapper");
-
-  blobWrapper.append("path")
-    .attr("class", "radarArea")
-    .attr("d", d => radarLine(d.slice(1)))
-    .style("fill", (d, i) => cfg.color(i))
-    .style("fill-opacity", 0)
-    .transition().duration(800)
-    .style("fill-opacity", cfg.opacityArea);
-
-  blobWrapper.append("path")
-    .attr("class", "radarStroke")
-    .attr("d", d => radarLine(d.slice(1)))
-    .style("stroke-width", cfg.strokeWidth + "px")
-    .style("stroke", (d, i) => cfg.color(i))
-    .style("fill", "none")
-    .style("stroke-opacity", 0)
-    .transition().duration(800)
-    .style("stroke-opacity", 1);
-
-  blobWrapper.each(function(d, i) {
-    d3.select(this).selectAll(".radarCircle")
-      .data(d.slice(1))
-      .enter().append("circle")
-      .attr("class", "radarCircle")
-      .attr("r", 0)
-      .attr("cx", 0)
-      .attr("cy", 0)
-      .style("fill", cfg.color(i))
-      .style("fill-opacity", 0.8)
-      .transition().duration(800)
-      .attr("r", cfg.dotRadius)
-      .attr("cx", (d, i) => rScale(d.value) * Math.cos(angleSlice * i - Math.PI / 2))
-      .attr("cy", (d, i) => rScale(d.value) * Math.sin(angleSlice * i - Math.PI / 2));
+  dimensions.forEach((dim, i) => {
+    const angle = angleSlice * i - Math.PI / 2;
+    const x = Math.cos(angle) * (radius + 20);
+    const y = Math.sin(angle) * (radius + 20);
+    svg.append("text")
+      .attr("class", "axisLabel")
+      .attr("x", x)
+      .attr("y", y)
+      .text(dim);
   });
-}
+
+  const radarLine = d3.lineRadial()
+    .radius(d => d.radius)
+    .angle((d, i) => i * angleSlice)
+    .curve(d3.curveCardinalClosed.tension(0.4));
+
+  const selectIds = ["bankSelect1", "bankSelect2", "bankSelect3", "bankSelect4"];
+
+  selectIds.forEach(id => {
+    const select = d3.select("#" + id);
+    select.append("option").attr("value", "").text("-- Select Bank --");
+    data.forEach(d => {
+      select.append("option")
+        .attr("value", d.name)
+        .text(d.name);
+    });
+    select.on("change", updateFromDropdowns);
+  });
+
+  function updateFromDropdowns() {
+    const selectedNames = selectIds.map(id => {
+      const sel = document.getElementById(id);
+      return sel.value;
+    }).filter(name => name); // Remove empty
+
+    updateRadar([...new Set(selectedNames)]);
+  }
+
+  function updateRadar(selectedNames) {
+    svg.selectAll(".series").remove();
+    const filteredData = data.filter(d => selectedNames.includes(d.name));
+
+    const group = svg.selectAll(".series")
+      .data(filteredData)
+      .enter()
+      .append("g")
+      .attr("class", "series");
+
+    group.append("path")
+      .attr("class", "line")
+      .attr("d", d => {
+        const points = dimensions.map((dim, i) => ({
+          radius: getScaledRadius(dim, d[dim])
+        }));
+        return radarLine(points);
+      })
+      .attr("stroke", d => color(d.name))
+      .attr("fill", d => color(d.name))
+      .attr("fill-opacity", 0.1)
+      .attr("stroke-width", 2)
+      .on("mouseover", function(event, d) {
+        svg.selectAll(".series").transition().duration(200).style("opacity", 0.1);
+        d3.select(this.parentNode).transition().duration(200).style("opacity", 1);
+        tooltip.transition().duration(200).style("opacity", 1);
+        tooltip.html(`<strong>${d.name}</strong>`)
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY - 28) + "px");
+      })
+      .on("mouseout", function() {
+        svg.selectAll(".series").transition().duration(300).style("opacity", 1);
+        tooltip.transition().duration(300).style("opacity", 0);
+      });
+
+    group.selectAll(".circle")
+      .data(d => dimensions.map((dim, i) => {
+        const angle = angleSlice * i - Math.PI / 2;
+        const r = getScaledRadius(dim, d[dim]);
+        return {
+          x: Math.cos(angle) * r,
+          y: Math.sin(angle) * r,
+          color: color(d.name)
+        };
+      }))
+      .enter()
+      .append("circle")
+      .attr("class", "circle")
+      .attr("r", 3)
+      .attr("cx", d => d.x)
+      .attr("cy", d => d.y)
+      .attr("fill", d => d.color);
+  }
+});
