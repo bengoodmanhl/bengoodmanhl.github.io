@@ -10,7 +10,9 @@ fetch(dataUrl)
   .then(data => {
     allBanksData = data;
     normalizedBankData = normalizeAllFieldsZScore(data); // ✅ Normalize full set
-
+    console.log("✅ Full dataset loaded");
+    console.log("🧮 Normalized full bank data:", normalizedBankData);
+    
     const bankNames = data.map(bank => bank.name);
     dropdownIds.forEach(id => populateDropdown(id, bankNames));
     addChangeListeners();
