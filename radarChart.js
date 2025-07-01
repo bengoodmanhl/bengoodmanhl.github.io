@@ -1,9 +1,9 @@
-function drawRadarChart(normalizedBank) {
+function drawRadarChart(normalized) {
   const svg = d3.select('#radarChart');
   svg.selectAll('*').remove(); // Clear previous chart
 
   const MIN_BANKS = 3;
-  if (!normalizedBank || normalizedBank.length < MIN_BANKS) return;
+  if (!normalized || normalized.length < MIN_BANKS) return;
 
   const size = 280;
   const radius = size;
@@ -11,7 +11,7 @@ function drawRadarChart(normalizedBank) {
   const height = +svg.attr('height');
   const center = { x: width / 2, y: height / 2 };
 
-  const axes = Object.keys(normalizedBank [0]).filter(k => k !== 'name');
+  const axes = Object.keys(normalized [0]).filter(k => k !== 'name');
   const angleSlice = (2 * Math.PI) / axes.length;
 
   // Scales
@@ -58,7 +58,7 @@ function drawRadarChart(normalizedBank) {
   const color = d3.scaleOrdinal(d3.schemeCategory10);
 
   // Draw lines
-  normalizedBank.forEach((bank, idx) => {
+  normalized.forEach((bank, idx) => {
     const points = axes.map((axis, i) => {
       const angle = angleSlice * i - Math.PI / 2;
       const r = radialScale(bank[axis]);
@@ -88,7 +88,7 @@ function drawRadarChart(normalizedBank) {
   });
 
   // Legend
-  normalizedBank.forEach((bank, i) => {
+  normalized.forEach((bank, i) => {
     svg.append('circle')
       .attr('cx', 10)
       .attr('cy', 20 + i * 20)
