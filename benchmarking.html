@@ -15,8 +15,19 @@
   <select id="bankSelect4"></select>
   <select id="bankSelect5"></select>
 
-  <svg id="radarChart" width="600" height="600"></svg>
-  <!-- Link external script -->
+  <svg id="radarChart" width="500" height="500"></svg>
+<script type="module">
+  import { drawRadarChart } from './Radar.js';
+
+  // Example: using your normalizedBankData from the page
+  drawRadarChart({
+    data: normalizedBankData,
+    elementId: 'radarChart',
+    size: 500
+  });
+</script>
+  
+  
   <script src="dataManipulation.js"></script>
 </body>
 </html>
