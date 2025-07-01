@@ -64,13 +64,31 @@ d3.json(url).then(data => {
       .text(dim);
   });
 
-  data.forEach((d, idx) => {
-    const coordinates = dimensions.map(dim => getPosition(dim, d[dim]));
-    svg.append("polygon")
-      .attr("points", coordinates.map(p => p.join(",")).join(" "))
-      .attr("stroke", color(d.name))
-      .attr("fill", color(d.name))
-      .attr("class", "line");
+const radarLine = d3.lineRadial()
+  .radius(d => d.radius)
+  .angle((d, i) => i * angleSlice)
+  .curve(d3.curveCardinalClosed);  // This adds the smoothing
+
+data.forEach(d => {
+  const points = dimensions.map((dim, i) => {
+    const value = d[dim];
+    const scale = d3.scaleLinear()
+      .domain(extentByDimension[dim])
+      .range([0, radius]);
+    return {
+      angle: i * angleSlice,
+      radius: scale(value)
+    };
+  });
+
+  svg.append("path")
+    .attr("d", radarLine(points))
+    .attr("stroke", color(d.name))
+    .attr("fill", color(d.name))
+    .attr("fill-opacity", 0.1)
+    .attr("stroke-width", 2)
+    .attr("class", "line");
+});
 
     coordinates.forEach(p => {
       svg.append("circle")
