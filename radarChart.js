@@ -42,3 +42,5 @@ blobWrapper.selectAll(".radarCircle")
   .attr("r", cfg.dotRadius)
   .attr("cx", (d, i) => rScale(d.value) * Math.cos(angleSlice * i - Math.PI / 2))
   .attr("cy", (d, i) => rScale(d.value) * Math.sin(angleSlice * i - Math.PI / 2));
+
+window.RadarChart = RadarChart;
