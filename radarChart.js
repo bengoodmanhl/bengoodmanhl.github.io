@@ -6,9 +6,7 @@ export function drawRadarChart({ data, elementId, size = 500 }) {
   const height = size;
   const radius = Math.min(width, height) / 2 - 60;
   const center = { x: width / 2, y: height / 2 };
-  const checkboxes = Array.from(document.querySelectorAll('#axisSelector input:checked'));
-const features = checkboxes.map(cb => cb.value);
-
+  const features = Object.keys(data[0]).filter(k => k !== "name");
   const angleSlice = (2 * Math.PI) / features.length;
   const scale = d3.scaleLinear().domain([-3, 3]).range([0, radius]);
 
@@ -52,7 +50,7 @@ levelsToDraw.forEach(level => {
   const lineGen = d3.lineRadial()
     .angle((d, i) => i * angleSlice)
     .radius(d => scale(d.value))
-    .curve(d3.curveCardinalClosed);
+    .curve(d3.curveLinearClosed);
 
   data.forEach((bank, i) => {
     const values = features.map(f => ({ axis: f, value: bank[f] }));
