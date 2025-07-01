@@ -1,6 +1,7 @@
-const dataUrl = 'https://raw.githubusercontent.com/bengoodmanhl/bengoodmanhl.github.io/refs/heads/main/RadarJSON.json'; // Replace with your real URL
+const dataUrl = 'https://raw.githubusercontent.com/bengoodmanhl/bengoodmanhl.github.io/refs/heads/main/RadarJSON.json'; 
 const dropdownIds = ['bankSelect1', 'bankSelect2', 'bankSelect3', 'bankSelect4', 'bankSelect5'];
 let allBanksData = [];
+let normalizedBankData = [];
 
 fetch(dataUrl)
   .then(res => res.json())
@@ -51,28 +52,26 @@ function getSelectedBankData() {
   return allBanksData.filter(bank => selectedNames.includes(bank.name));
 }
 
-function normalizeAllFields(data) {
+function normalizeAllFieldsZScore(data) {
   if (data.length === 0) return [];
 
   const numericKeys = Object.keys(data[0]).filter(
     key => typeof data[0][key] === 'number'
   );
 
-  const ranges = {};
+  const stats = {};
   numericKeys.forEach(key => {
     const values = data.map(d => d[key]);
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-    ranges[key] = { min, max };
+    const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+    const stdDev = Math.sqrt(values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length);
+    stats[key] = { mean, stdDev };
   });
 
   return data.map(bank => {
     const normalizedBank = { name: bank.name };
     numericKeys.forEach(key => {
-      const { min, max } = ranges[key];
-      normalizedBank[key] = max === min
-        ? 0.5
-        : (bank[key] - min) / (max - min);
+      const { mean, stdDev } = stats[key];
+      normalizedBank[key] = stdDev === 0 ? 0 : (bank[key] - mean) / stdDev;
     });
     return normalizedBank;
   });
@@ -83,9 +82,10 @@ function addChangeListeners() {
     document.getElementById(id).addEventListener('change', () => {
       dropdownIds.forEach(updateDropdownOptions);
       const selectedData = getSelectedBankData();
-      const normalized = normalizeAllFields(selectedData);
+      normalizedBankData = normalizeAllFieldsZScore(selectedData);
+
       console.log('Selected Bank Data:', selectedData);
-      console.log('Normalized Data:', normalized);
+      console.log('Z-Score Normalized Data:', normalizedBankData);
     });
   });
 }
