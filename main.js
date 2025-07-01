@@ -26,7 +26,8 @@ function createAxisCheckboxes(features) {
   });
 }
 
-
+const features = Object.keys(data[0]).filter(k => k !== 'name');
+createAxisCheckboxes(features);
 
 
 
