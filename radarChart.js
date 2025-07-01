@@ -89,30 +89,55 @@ function drawChart(data) {
     .attr("class", "series");
 
   // Radar path with animation
-  group.append("path")
-    .attr("class", "line")
-    .attr("d", d => {
-      const points = dimensions.map(dim => ({
-        radius: getScaledRadius(dim, d[dim])
-      }));
-      return radarLine(points);
-    })
-    .attr("stroke", d => color(d.name))
-    .attr("fill", d => color(d.name))
-    .attr("fill-opacity", 0.1)
-    .attr("stroke-width", 2)
-    .on("mouseover", function(event, d) {
-      container.selectAll(".series").transition().duration(200).style("opacity", 0.1);
-      d3.select(this.parentNode).transition().duration(200).style("opacity", 1);
-      tooltip.transition().duration(200).style("opacity", 1);
-      tooltip.html(`<strong>${d.name}</strong>`)
-        .style("left", `${event.pageX + 10}px`)
-        .style("top", `${event.pageY - 28}px`);
-    })
-    .on("mouseout", () => {
-      container.selectAll(".series").transition().duration(300).style("opacity", 1);
-      tooltip.transition().duration(300).style("opacity", 0);
-    })
+  // JOIN by name to track entries/updates/removals
+const series = container.selectAll(".series")
+  .data(data, d => d.name);
+
+// EXIT old elements
+series.exit().remove();
+
+// ENTER new groups
+const seriesEnter = series.enter()
+  .append("g")
+  .attr("class", "series");
+
+// ENTER: Animate new radar lines
+seriesEnter.append("path")
+  .attr("class", "line")
+  .attr("fill", d => color(d.name))
+  .attr("stroke", d => color(d.name))
+  .attr("fill-opacity", 0.1)
+  .attr("stroke-width", 2)
+  .attr("d", d => {
+    const points = dimensions.map(dim => ({ radius: getScaledRadius(dim, d[dim]) }));
+    return radarLine(points);
+  })
+  .attr("stroke-dasharray", function() {
+    const length = this.getTotalLength();
+    return `${length} ${length}`;
+  })
+  .attr("stroke-dashoffset", function() {
+    return this.getTotalLength();
+  })
+  .transition()
+  .duration(1000)
+  .attr("stroke-dashoffset", 0);
+
+// MOUSE EVENTS: Attach to both existing and new paths
+series.merge(seriesEnter).select(".line")
+  .on("mouseover", function(event, d) {
+    container.selectAll(".series").transition().duration(200).style("opacity", 0.1);
+    d3.select(this.parentNode).transition().duration(200).style("opacity", 1);
+    tooltip.transition().duration(200).style("opacity", 1);
+    tooltip.html(`<strong>${d.name}</strong>`)
+      .style("left", `${event.pageX + 10}px`)
+      .style("top", `${event.pageY - 28}px`);
+  })
+  .on("mouseout", () => {
+    container.selectAll(".series").transition().duration(300).style("opacity", 1);
+    tooltip.transition().duration(300).style("opacity", 0);
+  });
+
     .each(function() {
       const path = d3.select(this);
       const length = this.getTotalLength();
