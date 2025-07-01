@@ -1,31 +1,50 @@
-[ [
-    { "axis": "Battery Life", "value": 0.22 },
-    { "axis": "Brand", "value": 0.28 },
-    { "axis": "Contract Cost", "value": 0.29 },
-    { "axis": "Design And Quality", "value": 0.17 },
-    { "axis": "Have Internet Connectivity", "value": 0.22 },
-    { "axis": "Large Screen", "value": 0.02 },
-    { "axis": "Price Of Device", "value": 0.21 },
-    { "axis": "To Be A Smartphone", "value": 0.50 }
-  ],
-  [
-    { "axis": "Battery Life", "value": 0.27 },
-    { "axis": "Brand", "value": 0.16 },
-    { "axis": "Contract Cost", "value": 0.35 },
-    { "axis": "Design And Quality", "value": 0.13 },
-    { "axis": "Have Internet Connectivity", "value": 0.20 },
-    { "axis": "Large Screen", "value": 0.13 },
-    { "axis": "Price Of Device", "value": 0.35 },
-    { "axis": "To Be A Smartphone", "value": 0.38 }
-  ],
-  [
-    { "axis": "Battery Life", "value": 0.26 },
-    { "axis": "Brand", "value": 0.10 },
-    { "axis": "Contract Cost", "value": 0.30 },
-    { "axis": "Design And Quality", "value": 0.14 },
-    { "axis": "Have Internet Connectivity", "value": 0.22 },
-    { "axis": "Large Screen", "value": 0.04 },
-    { "axis": "Price Of Device", "value": 0.41 },
-    { "axis": "To Be A Smartphone", "value": 0.30 }
-  ]
+[
+  {
+    "name": "HSBC HOLDINGS PLC",
+    "Complaints per 1000": 3.2,
+    "Upheld%": 0.6,
+    "Closed 8 weeks+%": 0.0,
+    "FOS Upheld%": 0.3,
+    "FOS cases per 1m": 112.1
+  },
+  {
+    "name": "THE ROYAL BANK OF SCOTLAND GROUP",
+    "Complaints per 1000": 2.8,
+    "Upheld%": 0.6,
+    "Closed 8 weeks+%": 0.0,
+    "FOS Upheld%": 0.4,
+    "FOS cases per 1m": 91.1
+  },
+  {
+    "name": "NATIONWIDE BUILDING SOCIETY",
+    "Complaints per 1000": 2.3,
+    "Upheld%": 0.6,
+    "Closed 8 weeks+%": 0.1,
+    "FOS Upheld%": 0.3,
+    "FOS cases per 1m": 60.8
+  },
+  {
+    "name": "BARCLAYS PLC",
+    "Complaints per 1000": 2.1,
+    "Upheld%": 0.6,
+    "Closed 8 weeks+%": 0.0,
+    "FOS Upheld%": 0.4,
+    "FOS cases per 1m": 117.5
+  },
+  {
+    "name": "BANCO SANTANDER SA",
+    "Complaints per 1000": 2.5,
+    "Upheld%": 0.5,
+    "Closed 8 weeks+%": 0.0,
+    "FOS Upheld%": 0.3,
+    "FOS cases per 1m": 213.4
+  },
+  {
+    "name": "MONZO BANK LIMITED",
+    "Complaints per 1000": 3.8,
+    "Upheld%": 0.3,
+    "Closed 8 weeks+%": 0.2,
+    "FOS Upheld%": 0.4,
+    "FOS cases per 1m": 228.8
+  }
 ]
