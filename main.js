@@ -27,8 +27,6 @@ function createAxisCheckboxes(features) {
 }
 
 
-
-
 fetch(dataUrl)
   .then(res => res.json())
   .then(data => {
