@@ -9,6 +9,8 @@ fetch(dataUrl)
   .then(res => res.json())
   .then(data => {
     allBanksData = data;
+    normalizedBankData = normalizeAllFieldsZScore(data); // ✅ Normalize full set
+
     const bankNames = data.map(bank => bank.name);
     dropdownIds.forEach(id => populateDropdown(id, bankNames));
     addChangeListeners();
@@ -41,16 +43,17 @@ function updateDropdownOptions(currentId) {
   });
 }
 
-function getSelectedBankData() {
+function getSelectedNormalizedData() {
   const selectedNames = dropdownIds.map(id => document.getElementById(id).value).filter(name => name);
-  return allBanksData.filter(bank => selectedNames.includes(bank.name));
+  return normalizedBankData.filter(bank => selectedNames.includes(bank.name));
 }
 
 function normalizeAllFieldsZScore(data) {
-  if (data.length === 0) return [];
-  const numericKeys = Object.keys(data[0]).filter(k => typeof data[0][k] === 'number');
+  if (!data.length) return [];
 
+  const numericKeys = Object.keys(data[0]).filter(k => typeof data[0][k] === 'number');
   const stats = {};
+
   numericKeys.forEach(key => {
     const values = data.map(d => d[key]);
     const mean = values.reduce((sum, v) => sum + v, 0) / values.length;
@@ -59,12 +62,12 @@ function normalizeAllFieldsZScore(data) {
   });
 
   return data.map(bank => {
-    const norm = { name: bank.name };
+    const normalized = { name: bank.name };
     numericKeys.forEach(key => {
       const { mean, stdDev } = stats[key];
-      norm[key] = stdDev === 0 ? 0 : (bank[key] - mean) / stdDev;
+      normalized[key] = stdDev === 0 ? 0 : (bank[key] - mean) / stdDev;
     });
-    return norm;
+    return normalized;
   });
 }
 
@@ -72,10 +75,10 @@ function addChangeListeners() {
   dropdownIds.forEach(id => {
     document.getElementById(id).addEventListener('change', () => {
       dropdownIds.forEach(updateDropdownOptions);
-      const selected = getSelectedBankData();
-      normalizedBankData = normalizeAllFieldsZScore(selected);
+
+      const selectedNormalized = getSelectedNormalizedData();
       drawRadarChart({
-        data: normalizedBankData,
+        data: selectedNormalized,
         elementId: 'radarChart',
         size: 500
       });
