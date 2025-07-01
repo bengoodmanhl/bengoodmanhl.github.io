@@ -48,11 +48,15 @@ d3.json(url).then(data => {
     extentByDimension[d] = d3.extent(data, obj => obj[d]);
   });
 
-  function getScaledRadius(dimension, value) {
-    return d3.scaleLinear()
-      .domain(extentByDimension[dimension])
-      .range([0, 0.8 * radius])(value);
-  }
+function getScaledRadius(dimension, value) {
+  const rawValue = Math.max(0.1, value); // Clamp minimum to 0.1
+  return d3.scaleLinear()
+    .domain(extentByDimension[dimension])
+    .range([0, 0.9*radius])(rawValue);
+}
+
+
+  
 
   for (let level = 0; level <= 5; level++) {
     const r = radius * (level / 5);
