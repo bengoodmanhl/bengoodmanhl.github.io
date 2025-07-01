@@ -1,43 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="utf-8" />
-  <title>Interactive D3 Radar Chart with Clickable Legend</title>
+  <title>Smoothed D3.js Radar Chart</title>
 
   <style>
     body {
       font-family: 'Open Sans', sans-serif;
-      font-size: 13px;
+      font-size: 11px;
+      font-weight: 300;
+      fill: #242424;
       text-align: center;
+      cursor: default;
     }
 
-    #legend {
-      margin-top: 20px;
-    }
-
-    .legend-item {
-      display: inline-block;
-      margin-right: 15px;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .legend-circle {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      margin-right: 5px;
-      vertical-align: middle;
-    }
-
-    .legend-item.disabled .legend-circle {
-      opacity: 0.3;
+    .tooltip {
+      fill: #333333;
     }
   </style>
 
+  <!-- D3.js v3 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
-  <script src="radarChart.js"></script> <!-- assumes RadarChart function is defined -->
 </head>
 <body>
   <h2>Select Two Banks</h2>
@@ -58,15 +41,18 @@
     <option value="Bank4">Bank4</option>
   </select>
 
-  <div class="radarChart" style="margin-top: 30px;"></div>
-  <div id="legend"></div>
+  <div class="radarChart"></div>
+
+  <!-- Your radarChart.js should define RadarChart() globally -->
+  <script src="radarChart.js"></script>
 
   <script>
     const margin = { top: 100, right: 100, bottom: 100, left: 100 },
           width = Math.min(700, window.innerWidth - 10) - margin.left - margin.right,
           height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
 
-    const color = d3.scale.ordinal().range(["#EDC951", "#CC333F", "#00A0B0", "#6A4A3C"]);
+    const color = d3.scale.ordinal()
+      .range(["#EDC951", "#CC333F", "#00A0B0"]);
 
     const radarChartOptions = {
       w: width,
@@ -80,104 +66,74 @@
 
     const data = [
       [
-        { name: "Bank1", value: 0 },
-        { axis: "Complaints per 1000", value: 0.66 },
-        { axis: "Closed", value: 3.45 },
-        { axis: "Upheld%", value: 3.27 },
-        { axis: "Closed 8 weeks+%", value: 2.65 },
-        { axis: "FOS new cases#", value: 0.66 },
-        { axis: "FOS Upheld%", value: 0.81 },
-        { axis: "FOS cases per 1m", value: 1.13 }
+        { "name": "Bank1", "value": 0 },
+        { "axis": "Complaints per 1000", "value": 0.66 },
+        { "axis": "Closed", "value": 3.45 },
+        { "axis": "Upheld%", "value": 3.27 },
+        { "axis": "Closed 8 weeks+%", "value": 2.65 },
+        { "axis": "FOS new cases#", "value": 0.66 },
+        { "axis": "FOS Upheld%", "value": 0.81 },
+        { "axis": "FOS cases per 1m", "value": 1.13 }
       ],
       [
-        { name: "Bank2", value: 0 },
-        { axis: "Complaints per 1000", value: 1.11 },
-        { axis: "Closed", value: 1.46 },
-        { axis: "Upheld%", value: 1.32 },
-        { axis: "Closed 8 weeks+%", value: 1.87 },
-        { axis: "FOS new cases#", value: 1.11 },
-        { axis: "FOS Upheld%", value: 1.42 },
-        { axis: "FOS cases per 1m", value: 0.82 }
+        { "name": "Bank2", "value": 0 },
+        { "axis": "Complaints per 1000", "value": 1.11 },
+        { "axis": "Closed", "value": 1.46 },
+        { "axis": "Upheld%", "value": 1.32 },
+        { "axis": "Closed 8 weeks+%", "value": 1.87 },
+        { "axis": "FOS new cases#", "value": 1.11 },
+        { "axis": "FOS Upheld%", "value": 1.42 },
+        { "axis": "FOS cases per 1m", "value": 0.82 }
       ],
       [
-        { name: "Bank3", value: 0 },
-        { axis: "Complaints per 1000", value: 0.71 },
-        { axis: "Closed", value: 1.94 },
-        { axis: "Upheld%", value: 2.07 },
-        { axis: "Closed 8 weeks+%", value: 1.59 },
-        { axis: "FOS new cases#", value: 0.71 },
-        { axis: "FOS Upheld%", value: 0.77 },
-        { axis: "FOS cases per 1m", value: 0.86 }
+        { "name": "Bank3", "value": 0 },
+        { "axis": "Complaints per 1000", "value": 0.71 },
+        { "axis": "Closed", "value": 1.94 },
+        { "axis": "Upheld%", "value": 2.07 },
+        { "axis": "Closed 8 weeks+%", "value": 1.59 },
+        { "axis": "FOS new cases#", "value": 0.71 },
+        { "axis": "FOS Upheld%", "value": 0.77 },
+        { "axis": "FOS cases per 1m", "value": 0.86 }
       ],
       [
-        { name: "Bank4", value: 0 },
-        { axis: "Complaints per 1000", value: 0.84 },
-        { axis: "Closed", value: 1.15 },
-        { axis: "Upheld%", value: 1.21 },
-        { axis: "Closed 8 weeks+%", value: 1.12 },
-        { axis: "FOS new cases#", value: 0.84 },
-        { axis: "FOS Upheld%", value: 0.93 },
-        { axis: "FOS cases per 1m", value: 1.57 }
+        { "name": "Bank4", "value": 0 },
+        { "axis": "Complaints per 1000", "value": 0.84 },
+        { "axis": "Closed", "value": 1.15 },
+        { "axis": "Upheld%", "value": 1.21 },
+        { "axis": "Closed 8 weeks+%", "value": 1.12 },
+        { "axis": "FOS new cases#", "value": 0.84 },
+        { "axis": "FOS Upheld%", "value": 0.93 },
+        { "axis": "FOS cases per 1m", "value": 1.57 }
       ]
     ];
 
     const dropdown1 = document.getElementById("dropdown1");
     const dropdown2 = document.getElementById("dropdown2");
 
-    let activeBanks = [];
+    dropdown1.addEventListener("change", updateBankList);
+    dropdown2.addEventListener("change", updateBankList);
 
-    dropdown1.addEventListener("change", updateChart);
-    dropdown2.addEventListener("change", updateChart);
+    function updateBankList() {
+      const bank1 = dropdown1.value;
+      const bank2 = dropdown2.value;
 
-    function updateChart() {
-      const selected = Array.from(new Set([dropdown1.value, dropdown2.value]));
-      activeBanks = selected;
-      renderChart();
-    }
+      const names = Array.from(new Set([bank1, bank2]));
+      const filtered = data.filter(bankArray => {
+        const nameObj = bankArray.find(item => item.name);
+        return nameObj && names.includes(nameObj.name);
+      });
 
-    function renderChart() {
-      // Filter bank data
-      const filtered = data
-        .filter(bankArray => {
-          const nameObj = bankArray.find(d => d.name);
-          return nameObj && activeBanks.includes(nameObj.name);
-        })
-        .map(bankArray => bankArray.filter(d => d.axis !== undefined));
+      console.clear();
+      console.log("Selected banks:", names);
+      console.log("Filtered data:", filtered);
 
-      // Redraw chart
-      d3.select(".radarChart").selectAll("*").remove();
+      d3.select(".radarChart").selectAll("*").remove(); // clear chart before redrawing
+
       RadarChart(".radarChart", filtered, radarChartOptions);
-
-      // Draw Legend
-      const legend = d3.select("#legend").selectAll(".legend-item")
-        .data(activeBanks, d => d);
-
-      const legendEnter = legend.enter().append("span")
-        .attr("class", "legend-item")
-        .on("click", toggleBank);
-
-      legendEnter.append("span")
-        .attr("class", "legend-circle")
-        .style("background", (d, i) => radarChartOptions.color(i));
-
-      legendEnter.append("span")
-        .text(d => d);
-
-      legend.exit().remove();
     }
 
-    function toggleBank(name) {
-      const index = activeBanks.indexOf(name);
-      if (index !== -1) {
-        activeBanks.splice(index, 1);
-      } else {
-        activeBanks.push(name);
-      }
-      renderChart();
-    }
-
-    // Draw initial chart
-    updateChart();
+    // Initial chart draw
+    updateBankList();
   </script>
 </body>
 </html>
