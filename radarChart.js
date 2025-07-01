@@ -136,7 +136,7 @@ series.merge(seriesEnter).select(".line")
   .on("mouseout", () => {
     container.selectAll(".series").transition().duration(300).style("opacity", 1);
     tooltip.transition().duration(300).style("opacity", 0);
-  });
+  })
 
     .each(function() {
       const path = d3.select(this);
