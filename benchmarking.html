@@ -27,13 +27,14 @@
   <script>
     const dataUrl = 'https://raw.githubusercontent.com/bengoodmanhl/bengoodmanhl.github.io/refs/heads/main/RadarJSON.json'; // 🌐 Replace with your actual JSON URL
 
-    let normalizedData = [];
+
+let normalizedData = [];
 
 function zNormalize(data, keys) {
   const result = [];
   const stats = {};
 
-  // Step 1: Calculate mean and std dev for each key
+  // Calculate mean and std dev for each key
   keys.forEach(key => {
     const values = data.map(d => parseFloat(d[key]));
     const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
@@ -41,12 +42,12 @@ function zNormalize(data, keys) {
     stats[key] = { mean, stdDev };
   });
 
-  // Step 2: Normalize
+  // Normalize data
   data.forEach(d => {
     const norm = { name: d.name };
     keys.forEach(key => {
       const { mean, stdDev } = stats[key];
-      norm[key] = ((d[key] - mean) / stdDev).toFixed(3); // Rounded for display
+      norm[key] = ((d[key] - mean) / stdDev).toFixed(3);
     });
     result.push(norm);
   });
@@ -54,6 +55,25 @@ function zNormalize(data, keys) {
   return result;
 }
 
+// ✅ Function to populate dropdowns with optional preselection for the first two
+function populateDropdowns(bankNames) {
+  const dropdownIds = ['bank1', 'bank2', 'bank3', 'bank4'];
+  dropdownIds.forEach((id, i) => {
+    const select = document.getElementById(id);
+    select.innerHTML = '<option value="">-- Select a bank --</option>';
+    bankNames.forEach((name, index) => {
+      const option = document.createElement('option');
+      option.value = name;
+      option.textContent = name;
+      if ((i === 0 && index === 0) || (i === 1 && index === 1)) {
+        option.selected = true;
+      }
+      select.appendChild(option);
+    });
+  });
+}
+
+// Initial fetch
 fetch(dataUrl)
   .then(res => res.json())
   .then(rawData => {
@@ -66,9 +86,11 @@ fetch(dataUrl)
     ];
     normalizedData = zNormalize(rawData, fields);
     populateDropdowns(normalizedData.map(d => d.name));
+  })
+  .catch(error => {
+    console.error('Error fetching or processing data:', error);
   });
 
-// Optional: Triggered on dropdown change
 function createSelectedDataSet() {
   const selectedNames = [
     document.getElementById('bank1').value,
@@ -79,7 +101,7 @@ function createSelectedDataSet() {
 
   const selectedData = normalizedData.filter(bank => selectedNames.includes(bank.name));
   
-  const dataSet = selectedData.map(bank => ({
+  return selectedData.map(bank => ({
     label: bank.name,
     data: [
       parseFloat(bank.ComplaintsPer1000),
@@ -89,11 +111,8 @@ function createSelectedDataSet() {
       parseFloat(bank.FOSCasesPerMillion)
     ]
   }));
-
-  console.log('Normalized Dataset:', dataSet);
-  return dataSet;
 }
-  </script>
+</script>
 
 </body>
 </html>
