@@ -5,6 +5,31 @@ const dropdownIds = ['bankSelect1', 'bankSelect2', 'bankSelect3', 'bankSelect4',
 let allBanksData = [];
 let normalizedBankData = [];
 
+function createAxisCheckboxes(features) {
+  const container = document.getElementById('axisSelector');
+  container.innerHTML = ''; // Clear any existing checkboxes
+
+  features.forEach(feature => {
+    const label = document.createElement('label');
+    label.style.marginRight = '10px';
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.value = feature;
+    checkbox.checked = true; // Default: show all axes
+
+    checkbox.addEventListener('change', () => updateRadarWithSelectedAxes());
+
+    label.appendChild(checkbox);
+    label.appendChild(document.createTextNode(feature));
+    container.appendChild(label);
+  });
+}
+
+
+
+
+
 fetch(dataUrl)
   .then(res => res.json())
   .then(data => {
