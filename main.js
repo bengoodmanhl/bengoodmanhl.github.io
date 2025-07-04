@@ -1,14 +1,13 @@
-import { drawRadarChart } from './radarChart.js';
+import { drawRadarChartIncremental } from './radarChart.js';
 
 const dataUrl = 'https://raw.githubusercontent.com/bengoodmanhl/bengoodmanhl.github.io/refs/heads/main/RadarJSON.json';
 const dropdownIds = ['bankSelect1', 'bankSelect2', 'bankSelect3', 'bankSelect4', 'bankSelect5'];
 let allBanksData = [];
 let normalizedBankData = [];
+let previousSelectedNames = [];
 
-// Disable dropdowns initially
 dropdownIds.forEach(id => {
-  const select = document.getElementById(id);
-  select.disabled = true;
+  document.getElementById(id).disabled = true;
 });
 
 fetch(dataUrl)
@@ -16,26 +15,16 @@ fetch(dataUrl)
   .then(data => {
     allBanksData = data;
     normalizedBankData = normalizeAllFieldsZScore(data);
-    console.log("✅ Full dataset loaded");
-    console.log("🧮 Normalized full bank data:", normalizedBankData);
-
     const bankNames = data.map(bank => bank.name);
+
     dropdownIds.forEach(id => populateDropdown(id, bankNames));
+    dropdownIds.forEach(id => document.getElementById(id).disabled = false);
 
-    // Enable dropdowns after population
-    dropdownIds.forEach(id => {
-      document.getElementById(id).disabled = false;
-    });
-
-    // Preselect the first bank in the first dropdown
     if (bankNames.length > 0) {
-      const firstSelect = document.getElementById(dropdownIds[0]);
-      firstSelect.value = bankNames[0];
+      document.getElementById(dropdownIds[0]).value = bankNames[0];
     }
 
     addChangeListeners();
-
-    // Trigger initial chart update and disable selected option in others
     document.getElementById(dropdownIds[0]).dispatchEvent(new Event('change'));
     dropdownIds.forEach(updateDropdownOptions);
   })
@@ -91,27 +80,4 @@ function normalizeAllFieldsZScore(data) {
       const { mean, stdDev } = stats[key];
       normalized[key] = stdDev === 0 ? 0 : (bank[key] - mean) / stdDev;
     });
-    return normalized;
-  });
-}
-
-function addChangeListeners() {
-  dropdownIds.forEach(id => {
-    document.getElementById(id).addEventListener('change', () => {
-      dropdownIds.forEach(updateDropdownOptions);
-
-      const selectedNormalized = getSelectedNormalizedData();
-      if (selectedNormalized.length === 0) {
-        drawRadarChart({ data: [], elementId: 'radarChart', size: 500 });
-        return;
-      }
-
-      drawRadarChart({
-        data: selectedNormalized,
-        elementId: 'radarChart',
-        size: 500
-      });
-    });
-  });
-}
-
+    return
