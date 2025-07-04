@@ -72,3 +72,11 @@ body {
     margin: 0.25rem 0;
   }
 }
+
+#radarChart {
+  width: 100%;
+  height: auto;
+  max-width: 600px; /* Optional: limits how large it grows */
+  display: block;
+  margin: 0 auto;
+}
