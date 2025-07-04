@@ -3,31 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sankey Diagram with Internal Labels</title>
+  <link rel="stylesheet" href="styles.css" />
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
- 
-  <title>My Website</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-
-  <!-- Top Bar -->
-  <header class="top-bar">
-    <!-- <img src="logo.png" alt="Logo" class="logo" /> -->
-    <h1 class="site-name">My Website</h1>
-  </header>
-
-  <!-- Navigation Bar -->
-  <nav class="nav-bar">
-    <a href="index.html">Home</a>
-    <a href="benchmarking.html">Benchmarking</a>
-    <a href="FOSDecisions.html">FOS Decisions</a>
-  </nav>
-</body>
-  
-
-
-
   <style>
     body {
       font-family: sans-serif;
@@ -39,6 +18,7 @@
     .node text {
       font-size: 12px;
       pointer-events: none;
+      fill: white;
     }
     .link {
       fill: none;
@@ -46,9 +26,18 @@
     }
   </style>
 </head>
+<body>
 
-  
-  <body>
+  <header class="top-bar">
+    <h1 class="site-name">My Website</h1>
+  </header>
+
+  <nav class="nav-bar">
+    <a href="index.html">Home</a>
+    <a href="benchmarking.html">Benchmarking</a>
+    <a href="FOSDecisions.html">FOS Decisions</a>
+  </nav>
+
   <svg width="800" height="500"></svg>
 
   <script>
@@ -56,14 +45,29 @@
           width = +svg.attr("width"),
           height = +svg.attr("height");
 
-    const sankey = d3.sankey()
-      .nodeWidth(20)
-      .nodePadding(10)
-      .extent([[1, 1], [width - 1, height - 6]]);
-
     const color = d3.scaleOrdinal(d3.schemeCategory10);
 
+    // Load data and compute max label width
     d3.json("SankeyData.json").then(data => {
+      // Temporary text element to measure label width
+      const tempText = svg.append("text")
+        .attr("class", "temp-label")
+        .style("visibility", "hidden")
+        .style("font-size", "12px");
+
+      let maxLabelWidth = 0;
+      data.nodes.forEach(d => {
+        tempText.text(d.name);
+        const width = tempText.node().getBBox().width;
+        if (width > maxLabelWidth) maxLabelWidth = width;
+      });
+      tempText.remove();
+
+      const sankey = d3.sankey()
+        .nodeWidth(maxLabelWidth + 10) // Add padding
+        .nodePadding(10)
+        .extent([[1, 1], [width - 1, height - 6]]);
+
       const graph = sankey({
         nodes: data.nodes.map(d => Object.assign({}, d)),
         links: data.links.map(d => Object.assign({}, d))
@@ -91,16 +95,12 @@
           .attr("fill", d => color(d.id));
 
       node.append("text")
-          .attr("x", -6)
+          .attr("x", d => (d.x1 - d.x0) / 2)
           .attr("y", d => (d.y1 - d.y0) / 2)
           .attr("dy", "0.35em")
-          .attr("text-anchor", "end")
-          .text(d => d.name)
-        .filter(d => d.x0 < width / 2)
-          .attr("x", 6 + sankey.nodeWidth())
-          .attr("text-anchor", "start");
+          .attr("text-anchor", "middle")
+          .text(d => d.name);
     });
   </script>
 </body>
 </html>
-
