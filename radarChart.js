@@ -24,10 +24,7 @@ export function drawRadarChart({ data, elementId, size = 500 }) {
 
   const color = d3.scaleOrdinal(d3.schemeTableau10);
 
-  // Background circle
-  g.append("circle")
-    .attr("r", radius)
-    .attr("fill", "#f9f9f9");
+
 
   // Chart title
   svg.append("text")
