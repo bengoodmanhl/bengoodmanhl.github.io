@@ -15,14 +15,8 @@ export function drawRadarChart({ data, elementId, size = 500 }) {
 
   const features = Object.keys(data[0]).filter(k => k !== "name");
   const angleSlice = (2 * Math.PI) / features.length;
-
-  // Compute dynamic domain
-  const allValues = data.flatMap(d => features.map(f => d[f]));
-  const scale = d3.scaleLinear()
-    .domain(d3.extent(allValues))
-    .range([0, radius]);
-
-  const color = d3.scaleOrdinal(d3.schemeTableau10);
+  const scale = d3.scaleLinear().domain([-3, 3]).range([0, radius]); 
+    const color = d3.scaleOrdinal(d3.schemeTableau10);
 
 
 
