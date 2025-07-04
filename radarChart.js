@@ -1,4 +1,4 @@
-export function drawRadarChart({ data, elementId, size = 600 }) {
+export function drawRadarChart({ data, elementId, size = 400 }) {
   const margin = 60;
   const width = size + margin * 2;
   const height = size + margin * 2;
