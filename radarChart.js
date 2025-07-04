@@ -1,4 +1,4 @@
-export function drawRadarChart({ data, elementId, size = 500 }) {
+export function drawRadarChart({ data, elementId, size = 400 }) {
   const svg = d3.select(`#${elementId}`);
   svg.selectAll('*').remove();
 
