@@ -1,17 +1,15 @@
-export function drawRadarChart({ data, elementId, size = 400 }) {
-  const margin = 60;
-  const width = size + margin * 2;
-  const height = size + margin * 2;
-  const radius = size / 2 - 10;
-  const center = { x: width / 2, y: height / 2 };
-
+export function drawRadarChart({ data, elementId, size = 500 }) {
   const svg = d3.select(`#${elementId}`);
   svg.selectAll('*').remove();
-  svg.attr("width", width).attr("height", height);
+
+  const viewBoxSize = 600;
+  const margin = 80;
+  const radius = (viewBoxSize / 2) - margin;
+  const center = { x: viewBoxSize / 2, y: viewBoxSize / 2 };
 
   if (!data.length) return;
 
-  const g = svg.append("g").attr("transform", `translate(${margin}, ${margin})`);
+  const g = svg.append("g").attr("transform", `translate(${center.x}, ${center.y})`);
 
   const features = Object.keys(data[0]).filter(k => k !== "name");
   const angleSlice = (2 * Math.PI) / features.length;
@@ -20,15 +18,13 @@ export function drawRadarChart({ data, elementId, size = 400 }) {
 
   // Background circle
   g.append("circle")
-    .attr("cx", center.x - margin)
-    .attr("cy", center.y - margin)
     .attr("r", radius)
     .attr("fill", "#f9f9f9");
 
   // Chart title
-  g.append("text")
-    .attr("x", center.x - margin)
-    .attr("y", 0)
+  svg.append("text")
+    .attr("x", center.x)
+    .attr("y", 30)
     .attr("text-anchor", "middle")
     .style("font-size", "16px")
     .style("font-weight", "bold")
@@ -39,8 +35,6 @@ export function drawRadarChart({ data, elementId, size = 400 }) {
   const levelColors = { '-1': '#ff9999', '0': '#cccccc', '1': '#99ccff' };
   levelsToDraw.forEach(level => {
     const circle = g.append("circle")
-      .attr("cx", center.x - margin)
-      .attr("cy", center.y - margin)
       .attr("r", scale(level))
       .attr("stroke", levelColors[level])
       .attr("fill", "none")
@@ -51,19 +45,19 @@ export function drawRadarChart({ data, elementId, size = 400 }) {
   // Axes and labels
   features.forEach((feature, i) => {
     const angle = angleSlice * i - Math.PI / 2;
-    const x = center.x - margin + radius * Math.cos(angle);
-    const y = center.y - margin + radius * Math.sin(angle);
+    const x = radius * Math.cos(angle);
+    const y = radius * Math.sin(angle);
 
     g.append("line")
-      .attr("x1", center.x - margin)
-      .attr("y1", center.y - margin)
+      .attr("x1", 0)
+      .attr("y1", 0)
       .attr("x2", x)
       .attr("y2", y)
       .attr("stroke", "#aaa");
 
     g.append("text")
-      .attr("x", center.x - margin + (radius + 10) * Math.cos(angle))
-      .attr("y", center.y - margin + (radius + 10) * Math.sin(angle))
+      .attr("x", (radius + 12) * Math.cos(angle))
+      .attr("y", (radius + 12) * Math.sin(angle))
       .attr("dy", "0.35em")
       .attr("text-anchor", () => {
         if (Math.abs(Math.cos(angle)) < 0.1) return "middle";
@@ -83,7 +77,6 @@ export function drawRadarChart({ data, elementId, size = 400 }) {
     const values = features.map(f => ({ axis: f, value: bank[f] }));
 
     g.append("path")
-      .attr("transform", `translate(${center.x - margin},${center.y - margin})`)
       .attr("d", lineGen(values))
       .attr("stroke", color(i))
       .attr("fill", color(i))
@@ -91,11 +84,11 @@ export function drawRadarChart({ data, elementId, size = 400 }) {
       .attr("stroke-width", 2);
   });
 
-  // Legend
+  // Legend (outside the main group to avoid rotation)
   data.forEach((bank, i) => {
-    g.append("text")
-      .attr("x", width - margin * 2)
-      .attr("y", 40 + i * 16)
+    svg.append("text")
+      .attr("x", 20)
+      .attr("y", 40 + i * 18)
       .attr("fill", color(i))
       .style("font-size", "12px")
       .text(bank.name);
