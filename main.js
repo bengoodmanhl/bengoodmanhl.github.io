@@ -5,17 +5,39 @@ const dropdownIds = ['bankSelect1', 'bankSelect2', 'bankSelect3', 'bankSelect4',
 let allBanksData = [];
 let normalizedBankData = [];
 
+// Disable dropdowns initially
+dropdownIds.forEach(id => {
+  const select = document.getElementById(id);
+  select.disabled = true;
+});
+
 fetch(dataUrl)
   .then(res => res.json())
   .then(data => {
     allBanksData = data;
-    normalizedBankData = normalizeAllFieldsZScore(data); // ✅ Normalize full set
+    normalizedBankData = normalizeAllFieldsZScore(data);
     console.log("✅ Full dataset loaded");
     console.log("🧮 Normalized full bank data:", normalizedBankData);
-    
+
     const bankNames = data.map(bank => bank.name);
     dropdownIds.forEach(id => populateDropdown(id, bankNames));
+
+    // Enable dropdowns after population
+    dropdownIds.forEach(id => {
+      document.getElementById(id).disabled = false;
+    });
+
+    // Preselect the first bank in the first dropdown
+    if (bankNames.length > 0) {
+      const firstSelect = document.getElementById(dropdownIds[0]);
+      firstSelect.value = bankNames[0];
+    }
+
     addChangeListeners();
+
+    // Trigger initial chart update and disable selected option in others
+    document.getElementById(dropdownIds[0]).dispatchEvent(new Event('change'));
+    dropdownIds.forEach(updateDropdownOptions);
   })
   .catch(err => console.error('Failed to fetch bank data:', err));
 
@@ -46,44 +68,4 @@ function updateDropdownOptions(currentId) {
 }
 
 function getSelectedNormalizedData() {
-  const selectedNames = dropdownIds.map(id => document.getElementById(id).value).filter(name => name);
-  return normalizedBankData.filter(bank => selectedNames.includes(bank.name));
-}
-
-function normalizeAllFieldsZScore(data) {
-  if (!data.length) return [];
-
-  const numericKeys = Object.keys(data[0]).filter(k => typeof data[0][k] === 'number');
-  const stats = {};
-
-  numericKeys.forEach(key => {
-    const values = data.map(d => d[key]);
-    const mean = values.reduce((sum, v) => sum + v, 0) / values.length;
-    const stdDev = Math.sqrt(values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / values.length);
-    stats[key] = { mean, stdDev };
-  });
-
-  return data.map(bank => {
-    const normalized = { name: bank.name };
-    numericKeys.forEach(key => {
-      const { mean, stdDev } = stats[key];
-      normalized[key] = stdDev === 0 ? 0 : (bank[key] - mean) / stdDev;
-    });
-    return normalized;
-  });
-}
-
-function addChangeListeners() {
-  dropdownIds.forEach(id => {
-    document.getElementById(id).addEventListener('change', () => {
-      dropdownIds.forEach(updateDropdownOptions);
-
-      const selectedNormalized = getSelectedNormalizedData();
-      drawRadarChart({
-        data: selectedNormalized,
-        elementId: 'radarChart',
-        size: 500
-      });
-    });
-  });
-}
+  const selectedNames = dropdownIds.map(id => document.getElementById(id
