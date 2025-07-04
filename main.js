@@ -68,4 +68,49 @@ function updateDropdownOptions(currentId) {
 }
 
 function getSelectedNormalizedData() {
-  const selectedNames = dropdownIds.map(id => document.getElementById(id
+  const selectedNames = dropdownIds.map(id => document.getElementById(id).value).filter(name => name);
+  return normalizedBankData.filter(bank => selectedNames.includes(bank.name));
+}
+
+function normalizeAllFieldsZScore(data) {
+  if (!data.length) return [];
+
+  const numericKeys = Object.keys(data[0]).filter(k => typeof data[0][k] === 'number');
+  const stats = {};
+
+  numericKeys.forEach(key => {
+    const values = data.map(d => d[key]);
+    const mean = values.reduce((sum, v) => sum + v, 0) / values.length;
+    const stdDev = Math.sqrt(values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / values.length);
+    stats[key] = { mean, stdDev };
+  });
+
+  return data.map(bank => {
+    const normalized = { name: bank.name };
+    numericKeys.forEach(key => {
+      const { mean, stdDev } = stats[key];
+      normalized[key] = stdDev === 0 ? 0 : (bank[key] - mean) / stdDev;
+    });
+    return normalized;
+  });
+}
+
+function addChangeListeners() {
+  dropdownIds.forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+      dropdownIds.forEach(updateDropdownOptions);
+
+      const selectedNormalized = getSelectedNormalizedData();
+      if (selectedNormalized.length === 0) {
+        drawRadarChart({ data: [], elementId: 'radarChart', size: 500 });
+        return;
+      }
+
+      drawRadarChart({
+        data: selectedNormalized,
+        elementId: 'radarChart',
+        size: 500
+      });
+    });
+  });
+}
