@@ -34,7 +34,11 @@ body {
   justify-content: center;
   background-color: #555;
   padding: 0.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000; /* ensures it stays above other content */
 }
+
 
 .nav-bar a {
   color: white;
