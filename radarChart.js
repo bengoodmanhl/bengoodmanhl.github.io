@@ -70,7 +70,7 @@ export function drawRadarChart({ data, elementId, size = 500 }) {
   const lineGen = d3.lineRadial()
     .angle((d, i) => i * angleSlice)
     .radius(d => scale(d.value))
-    .curve(d3.curveLinearClosed);
+    .curve(d3.curveCardinalClosed);
 
   // Tooltip
   const tooltip = d3.select("body").append("div")
