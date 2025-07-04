@@ -80,4 +80,6 @@ function normalizeAllFieldsZScore(data) {
       const { mean, stdDev } = stats[key];
       normalized[key] = stdDev === 0 ? 0 : (bank[key] - mean) / stdDev;
     });
-    return
+    return normalized;
+  });
+}
