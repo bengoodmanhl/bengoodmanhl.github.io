@@ -83,3 +83,25 @@ function normalizeAllFieldsZScore(data) {
     return normalized;
   });
 }
+
+function addChangeListeners() {
+  dropdownIds.forEach(id => {
+    const select = document.getElementById(id);
+    select.addEventListener('change', () => {
+      const selectedData = getSelectedNormalizedData();
+
+      const currentSelectedNames = dropdownIds.map(id => document.getElementById(id).value);
+      const changedBank = currentSelectedNames.find((name, i) => name !== previousSelectedNames[i]);
+
+      drawRadarChartIncremental({
+        data: selectedData,
+        elementId: 'radarChart',
+        size: 500,
+        changedBank
+      });
+
+      dropdownIds.forEach(updateDropdownOptions);
+      previousSelectedNames = [...currentSelectedNames];
+    });
+  });
+}
