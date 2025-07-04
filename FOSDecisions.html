@@ -46,7 +46,9 @@
     }
   </style>
 </head>
-<body>
+
+  
+  <body>
   <svg width="800" height="500"></svg>
 
   <script>
@@ -93,7 +95,7 @@
           .attr("y", d => (d.y1 - d.y0) / 2)
           .attr("dy", "0.35em")
           .attr("text-anchor", "end")
-          .text(d => d.id)
+          .text(d => d.name)
         .filter(d => d.x0 < width / 2)
           .attr("x", 6 + sankey.nodeWidth())
           .attr("text-anchor", "start");
