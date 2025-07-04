@@ -1,6 +1,6 @@
-export function drawRadarChart({ data, elementId, size = 500 }) {
+export function drawRadarChartIncremental({ data, elementId, size = 500, changedBank }) {
   const svg = d3.select(`#${elementId}`);
-  svg.selectAll('*').remove();
+  svg.selectAll("text.chart-title").remove(); // Remove old title if redrawing
 
   const margin = 80;
   const viewBoxSize = size;
@@ -9,127 +9,124 @@ export function drawRadarChart({ data, elementId, size = 500 }) {
 
   svg.attr("viewBox", `0 0 ${viewBoxSize} ${viewBoxSize}`);
 
-  if (!data.length) return;
+  if (!data.length) {
+    svg.selectAll("*").remove();
+    return;
+  }
 
-  const g = svg.append("g").attr("transform", `translate(${center.x}, ${center.y})`);
+  let g = svg.select("g.chart-group");
+  if (g.empty()) {
+    g = svg.append("g")
+      .attr("class", "chart-group")
+      .attr("transform", `translate(${center.x}, ${center.y})`);
+
+    // Chart title
+    svg.append("text")
+      .attr("class", "chart-title")
+      .attr("x", center.x)
+      .attr("y", 30)
+      .attr("text-anchor", "middle")
+      .style("font-size", "16px")
+      .style("font-weight", "bold")
+      .text("Bank Performance Radar");
+
+    // Axes and rings
+    const features = Object.keys(data[0]).filter(k => k !== "name");
+    const angleSlice = (2 * Math.PI) / features.length;
+    const scale = d3.scaleLinear().domain([-3, 3]).range([0, radius]);
+    const levelColors = { '-1': '#ff9999', '0': '#cccccc', '1': '#99ccff' };
+
+    [-1, 0, 1].forEach(level => {
+      const circle = g.append("circle")
+        .attr("r", scale(level))
+        .attr("stroke", levelColors[level])
+        .attr("fill", "none")
+        .attr("stroke-width", level === 0 ? 2 : 1);
+      if (level === 0) circle.attr("stroke-dasharray", "2,2");
+    });
+
+    features.forEach((feature, i) => {
+      const angle = angleSlice * i - Math.PI / 2;
+      const x = radius * Math.cos(angle);
+      const y = radius * Math.sin(angle);
+
+      g.append("line")
+        .attr("x1", 0)
+        .attr("y1", 0)
+        .attr("x2", x)
+        .attr("y2", y)
+        .attr("stroke", "#aaa");
+
+      g.append("text")
+        .attr("x", (radius + 12) * Math.cos(angle))
+        .attr("y", (radius + 12) * Math.sin(angle))
+        .attr("dy", "0.35em")
+        .attr("text-anchor", () => {
+          if (Math.abs(Math.cos(angle)) < 0.1) return "middle";
+          return Math.cos(angle) < 0 ? "end" : "start";
+        })
+        .style("font-size", "11px")
+        .text(feature);
+    });
+  }
 
   const features = Object.keys(data[0]).filter(k => k !== "name");
   const angleSlice = (2 * Math.PI) / features.length;
-  const scale = d3.scaleLinear().domain([-3, 3]).range([0, radius]); 
-    const color = d3.scaleOrdinal(d3.schemeTableau10);
+  const scale = d3.scaleLinear().domain([-3, 3]).range([0, radius]);
+  const color = d3.scaleOrdinal(d3.schemeTableau10);
 
-
-
-  // Chart title
-  svg.append("text")
-    .attr("x", center.x)
-    .attr("y", 30)
-    .attr("text-anchor", "middle")
-    .style("font-size", "16px")
-    .style("font-weight", "bold")
-    .text("Bank Performance Radar");
-
-  // Standard deviation rings (optional: based on fixed values)
-  const levelsToDraw = [-1, 0, 1];
-  const levelColors = { '-1': '#ff9999', '0': '#cccccc', '1': '#99ccff' };
-  levelsToDraw.forEach(level => {
-    const circle = g.append("circle")
-      .attr("r", scale(level))
-      .attr("stroke", levelColors[level])
-      .attr("fill", "none")
-      .attr("stroke-width", level === 0 ? 2 : 1);
-    if (level === 0) circle.attr("stroke-dasharray", "2,2");
-  });
-
-  // Axes and labels
-  features.forEach((feature, i) => {
-    const angle = angleSlice * i - Math.PI / 2;
-    const x = radius * Math.cos(angle);
-    const y = radius * Math.sin(angle);
-
-    g.append("line")
-      .attr("x1", 0)
-      .attr("y1", 0)
-      .attr("x2", x)
-      .attr("y2", y)
-      .attr("stroke", "#aaa");
-
-    g.append("text")
-      .attr("x", (radius + 12) * Math.cos(angle))
-      .attr("y", (radius + 12) * Math.sin(angle))
-      .attr("dy", "0.35em")
-      .attr("text-anchor", () => {
-        if (Math.abs(Math.cos(angle)) < 0.1) return "middle";
-        return Math.cos(angle) < 0 ? "end" : "start";
-      })
-      .style("font-size", "11px")
-      .text(feature);
-  });
-
-  // Radar line generator
   const lineGen = d3.lineRadial()
     .angle((d, i) => i * angleSlice)
     .radius(d => scale(d.value))
     .curve(d3.curveCardinalClosed);
 
-  // Tooltip
-  const tooltip = d3.select("body").append("div")
-    .attr("class", "radar-tooltip")
-    .style("position", "absolute")
-    .style("padding", "6px 10px")
-    .style("background", "#333")
-    .style("color", "#fff")
-    .style("border-radius", "4px")
-    .style("font-size", "12px")
-    .style("pointer-events", "none")
-    .style("opacity", 0);
+  const radarGroup = g.selectAll(".radar-area")
+    .data(data, d => d.name);
 
-  // Radar areas
-  const radarGroups = g.selectAll(".radar-area")
-    .data(data)
-    .enter()
-    .append("g")
-    .attr("class", "radar-area");
+  // Update existing paths
+  radarGroup.select("path")
+    .filter(d => d.name !== changedBank)
+    .attr("d", d => lineGen(features.map(f => ({ axis: f, value: d[f] }))));
 
-  radarGroups.append("path")
-    .attr("d", d => {
-      const values = features.map(f => ({ axis: f, value: d[f] }));
-      return lineGen(values);
-    })
-    .attr("stroke", (d, i) => color(i))
-    .attr("fill", (d, i) => color(i))
-    .attr("fill-opacity", 0.2)
-    .attr("stroke-width", 2)
-    .on("mouseover", function (event, d) {
-      d3.select(this).attr("fill-opacity", 0.4);
-      tooltip.transition().duration(200).style("opacity", 1);
-      tooltip.html(`<strong>${d.name}</strong>`)
-        .style("left", `${event.pageX + 10}px`)
-        .style("top", `${event.pageY - 20}px`);
-    })
-    .on("mousemove", function (event) {
-      tooltip.style("left", `${event.pageX + 10}px`)
-             .style("top", `${event.pageY - 20}px`);
-    })
-    .on("mouseout", function () {
-      d3.select(this).attr("fill-opacity", 0.2);
-      tooltip.transition().duration(200).style("opacity", 0);
-    });
+  // Add or update changed path
+  const changedData = data.find(d => d.name === changedBank);
+  if (changedData) {
+    const values = features.map(f => ({ axis: f, value: changedData[f] }));
+    const existing = radarGroup.filter(d => d.name === changedBank);
+
+    if (!existing.empty()) {
+      existing.select("path")
+        .transition()
+        .duration(800)
+        .attr("d", lineGen(values));
+    } else {
+      const newGroup = g.append("g")
+        .datum(changedData)
+        .attr("class", "radar-area");
+
+      newGroup.append("path")
+        .attr("d", lineGen(values))
+        .attr("stroke", color(data.indexOf(changedData)))
+        .attr("fill", color(data.indexOf(changedData)))
+        .attr("fill-opacity", 0.2)
+        .attr("stroke-width", 2)
+        .style("opacity", 0)
+        .transition()
+        .duration(800)
+        .style("opacity", 1);
+    }
+  }
 
   // Legend
-  const legend = svg.append("g").attr("transform", `translate(20, ${viewBoxSize - 20 - data.length * 18})`);
+  svg.selectAll("g.legend").remove();
+  const legend = svg.append("g")
+    .attr("class", "legend")
+    .attr("transform", `translate(20, ${viewBoxSize - 20 - data.length * 18})`);
 
   data.forEach((bank, i) => {
     const legendItem = legend.append("g")
       .attr("transform", `translate(0, ${i * 18})`)
-      .style("cursor", "pointer")
-      .on("mouseover", () => {
-        radarGroups.selectAll("path")
-          .attr("fill-opacity", (d, j) => j === i ? 0.4 : 0.1);
-      })
-      .on("mouseout", () => {
-        radarGroups.selectAll("path").attr("fill-opacity", 0.2);
-      });
+      .style("cursor", "pointer");
 
     legendItem.append("rect")
       .attr("width", 12)
