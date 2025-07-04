@@ -80,3 +80,29 @@ body {
   display: block;
   margin: 0 auto;
 }
+
+/* Style all dropdowns by class */
+.bank-select {
+  padding: 4px 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  color: #333;
+  width: 180px;
+  margin: 6px;
+  appearance: none; /* Remove default arrow styling (optional) */
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+}
+
+/* Optional: Add hover/focus effects */
+.bank-select:hover,
+.bank-select:focus {
+  border-color: #888;
+  background-color: #fff;
+  outline: none;
+}
+
