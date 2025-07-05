@@ -74,7 +74,6 @@ export function drawRadarChartIncremental({ data, elementId, size = 500, changed
   const angleSlice = (2 * Math.PI) / features.length;
   const scale = d3.scaleLinear().domain([-3, 3]).range([0, radius]);
 
-  // ✅ Use bank names for consistent color mapping
   const color = d3.scaleOrdinal()
     .domain(data.map(d => d.name))
     .range(d3.schemeTableau10);
@@ -84,15 +83,23 @@ export function drawRadarChartIncremental({ data, elementId, size = 500, changed
     .radius(d => scale(d.value))
     .curve(d3.curveCardinalClosed);
 
+  // JOIN: Bind data to radar areas
   const radarGroup = g.selectAll(".radar-area")
     .data(data, d => d.name);
 
-  // Update existing paths
+  // EXIT: Remove old radar areas
+  radarGroup.exit()
+    .transition()
+    .duration(500)
+    .style("opacity", 0)
+    .remove();
+
+  // UPDATE: Update existing paths
   radarGroup.select("path")
     .filter(d => d.name !== changedBank)
     .attr("d", d => lineGen(features.map(f => ({ axis: f, value: d[f] }))));
 
-  // Add or update changed path
+  // ENTER or UPDATE changed bank
   const changedData = data.find(d => d.name === changedBank);
   if (changedData) {
     const values = features.map(f => ({ axis: f, value: changedData[f] }));
@@ -121,7 +128,7 @@ export function drawRadarChartIncremental({ data, elementId, size = 500, changed
     }
   }
 
-  // Legend
+  // LEGEND
   svg.selectAll("g.legend").remove();
   const legend = svg.append("g")
     .attr("class", "legend")
