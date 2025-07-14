@@ -1,0 +1,14 @@
+[
+  {
+    "title": "Introduction to Databases",
+    "keywords": ["oracle", "sql", "json", "cloud"],
+    "url": "/intro-databases.html",
+    "excerpt": "Learn the basics of Oracle and SQL in cloud environments."
+  },
+  {
+    "title": "Python for Data Ingestion",
+    "keywords": ["python", "json", "ingestion", "oci"],
+    "url": "/python-ingestion.html",
+    "excerpt": "Use Python to ingest JSON into Oracle Autonomous Database."
+  }
+]
